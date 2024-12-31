@@ -1,5 +1,5 @@
 from pydantic import BaseModel, conint
-from datetime import date
+from datetime import datetime
 from typing import Optional
 
 
@@ -9,8 +9,8 @@ class ReviewBase(BaseModel):
     product_id: int
     rating: conint(ge=1, le=5)  # Rating should be between 1 and 5
     comment: Optional[str] = None
-    created_at: date
-    updated_at: date
+    created_at: datetime
+    updated_at: datetime
 
 
 # Properties to receive via API when updating review details, all are optional
