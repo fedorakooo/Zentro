@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Table, Column, Integer, String, Date, MetaData, ForeignKey
+    Table, Column, Integer, String, DateTime, MetaData, ForeignKey
 )
 from sqlalchemy.sql import expression
 
@@ -16,6 +16,6 @@ reviews_table = Table(
     Column("product_id", Integer, ForeignKey(products_table.c.id), nullable=False),
     Column("rating", Integer, nullable=False),
     Column("comment", String(1000), nullable=True),
-    Column("created_at", Date, server_default=expression.func.now(), nullable=False),
-    Column("updated_at", Date, server_default=expression.func.now(), onupdate=expression.func.now(), nullable=False)
+    Column("created_at", DateTime, server_default=expression.func.now(), nullable=False),
+    Column("updated_at", DateTime, server_default=expression.func.now(), onupdate=expression.func.now(), nullable=False)
 )

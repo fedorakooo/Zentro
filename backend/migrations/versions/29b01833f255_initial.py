@@ -1,8 +1,8 @@
-"""Added required tables
+"""Initial
 
-Revision ID: 2ec0f5af2419
+Revision ID: 29b01833f255
 Revises: 
-Create Date: 2024-12-31 14:52:59.222558
+Create Date: 2024-12-31 21:20:29.727613
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '2ec0f5af2419'
+revision: str = '29b01833f255'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -29,12 +29,12 @@ def upgrade() -> None:
     sa.Column('is_active', sa.Boolean(), server_default=sa.text('true'), nullable=False),
     sa.Column('is_seller', sa.Boolean(), server_default=sa.text('false'), nullable=False),
     sa.Column('balance', sa.Float(), server_default='0.0', nullable=False),
-    sa.Column('registration_date', sa.Date(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('registration_date', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('address', sa.String(length=300), nullable=True),
     sa.Column('loyalty_points', sa.Float(), server_default='0.0', nullable=False),
     sa.Column('profile_picture_url', sa.String(length=300), nullable=True),
     sa.Column('referral_code', sa.String(length=50), nullable=True),
-    sa.Column('gender', sa.String(length=10), nullable=True),
+    sa.Column('gender', sa.String(length=1), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('referral_code')
     )
@@ -45,29 +45,52 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('card_number', sa.String(length=4), nullable=False),
     sa.Column('card_type', sa.String(length=50), nullable=False),
-    sa.Column('expiry_date', sa.Date(), nullable=False),
+    sa.Column('expiry_date', sa.DateTime(), nullable=False),
     sa.Column('is_default', sa.Boolean(), server_default='false', nullable=False),
     sa.Column('card_holder_name', sa.String(length=150), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('categories',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('name', sa.String(length=100), nullable=False),
+    sa.Column('parent_id', sa.Integer(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['parent_id'], ['categories.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('name')
+    )
     op.create_table('products',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('manufacturer', sa.String(length=150), nullable=False),
     sa.Column('name', sa.String(length=150), nullable=False),
     sa.Column('description', sa.String(length=1000), nullable=True),
+    sa.Column('attributes', sa.JSON(), nullable=True),
     sa.Column('price', sa.Float(), nullable=False),
-    sa.Column('category', sa.String(length=100), nullable=False),
+    sa.Column('category_id', sa.Integer(), nullable=False),
     sa.Column('quantity_in_stock', sa.Integer(), nullable=False),
     sa.Column('image_url', sa.String(length=300), nullable=True),
     sa.Column('is_active', sa.Boolean(), server_default='true', nullable=False),
-    sa.Column('created_at', sa.Date(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.Date(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('product_sizes',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('product_id', sa.Integer(), nullable=False),
+    sa.Column('size', sa.String(length=50), nullable=False),
+    sa.Column('quantity', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('orders',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('order_date', sa.Date(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('order_date', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('total_amount', sa.Float(), nullable=False),
     sa.Column('status', sa.String(length=50), nullable=False),
     sa.Column('shipping_address', sa.String(length=300), nullable=True),
@@ -91,8 +114,8 @@ def upgrade() -> None:
     sa.Column('product_id', sa.Integer(), nullable=False),
     sa.Column('rating', sa.Integer(), nullable=False),
     sa.Column('comment', sa.String(length=1000), nullable=True),
-    sa.Column('created_at', sa.Date(), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.Date(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -105,7 +128,9 @@ def downgrade() -> None:
     op.drop_table('reviews')
     op.drop_table('order_products')
     op.drop_table('orders')
+    op.drop_table('product_sizes')
     op.drop_table('products')
+    op.drop_table('categories')
     op.drop_table('saved_cards')
     op.drop_index(op.f('ix_users_phone_number'), table_name='users')
     op.drop_index(op.f('ix_users_email'), table_name='users')

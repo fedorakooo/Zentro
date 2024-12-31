@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Table, Column, String, Float, Date, ForeignKey, MetaData, Integer
+    Table, Column, String, Float, DateTime, ForeignKey, MetaData, Integer
 )
 from sqlalchemy.sql import expression
 
@@ -13,7 +13,7 @@ orders_table = Table(
     metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),
     Column("user_id", Integer, ForeignKey(users_table.c.id), nullable=False),
-    Column("order_date", Date, server_default=expression.func.now(), nullable=False),
+    Column("order_date", DateTime, server_default=expression.func.now(), nullable=False),
     Column("total_amount", Float, nullable=False),
     Column("status", String(50), nullable=False),
     Column("shipping_address", String(300), nullable=True),
