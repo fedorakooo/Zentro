@@ -1,7 +1,6 @@
-from typing import Optional
-
 from pydantic import BaseModel
 from datetime import date
+from typing import Optional
 
 
 # Shared properties for product, base class for common product attributes
