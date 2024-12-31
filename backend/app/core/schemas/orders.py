@@ -1,12 +1,12 @@
 from pydantic import BaseModel, condecimal
-from datetime import date
-from typing import Optional, List
+from datetime import datetime
+from typing import Optional
 
 
 # Shared properties for order, base class for common order attributes
 class OrderBase(BaseModel):
     user_id: int
-    order_date: date
+    order_date: datetime
     total_amount: condecimal(gt=0)  # Ensure total amount is greater than zero
     status: str
     shipping_address: Optional[str] = None
