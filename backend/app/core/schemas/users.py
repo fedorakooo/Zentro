@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, condecimal, constr
-from datetime import date
+from datetime import datetime
 from typing import Optional
 
 
@@ -11,7 +11,7 @@ class UserBase(BaseModel):
     is_active: bool = True
     is_seller: bool = False
     balance: condecimal(max_digits=10, decimal_places=2) = 0.0
-    registration_date: date
+    registration_date: datetime
     address: Optional[str] = None
     loyalty_points: condecimal(max_digits=10, decimal_places=2) = 0.0
     profile_picture_url: Optional[str] = None
@@ -55,7 +55,7 @@ class User(UserBase):
 class SavedCardBase(BaseModel):
     card_number: str
     card_type: str
-    expiry_date: date
+    expiry_date: datetime
     card_holder_name: str
     is_default: bool = False
 
