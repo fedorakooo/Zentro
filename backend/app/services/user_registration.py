@@ -1,0 +1,56 @@
+import hashlib
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.exc import IntegrityError
+from fastapi import HTTPException, status
+from app.core.models.users import users_table
+import random
+import string
+
+
+async def register_user(db: AsyncSession, email: str, phone_number: str, name: str, password: str):
+    async with db.begin():
+        result = await db.execute(select(users_table).filter(users_table.c.email == email))
+        existing_user = result.scalars().first()
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email is already registered"
+            )
+
+        result = await db.execute(select(users_table).filter(users_table.c.phone_number == phone_number))
+        existing_user = result.scalars().first()
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Phone number is already registered"
+            )
+
+        referral_code = generate_referral_code()
+
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
+        new_user_data = {
+            "email": email,
+            "name": name,
+            "phone_number": phone_number,
+            "hashed_password": hashed_password,
+            "referral_code": referral_code,
+        }
+
+        await db.execute(users_table.insert().values(new_user_data))
+
+    try:
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error occurred during user registration.",
+        )
+
+    return {"message": "User registered successfully", "email": email}
+
+def generate_referral_code(length=8):
+    letters_and_digits = string.ascii_uppercase + string.digits
+    return ''.join(random.choice(letters_and_digits) for i in range(length))

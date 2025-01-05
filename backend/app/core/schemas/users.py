@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, condecimal, constr
+from pydantic import BaseModel, EmailStr, condecimal, Field
 from datetime import datetime
 from typing import Optional
 
@@ -7,7 +7,7 @@ from typing import Optional
 class UserBase(BaseModel):
     email: Optional[EmailStr] = None
     name: str
-    phone_number: constr(regex=r"^\+?\d{1,3}?[-.\s]?\(?\d+\)?[-.\s]?\d+[-.\s]?\d+$")
+    phone_number: str
     is_active: bool = True
     is_seller: bool = False
     balance: condecimal(max_digits=10, decimal_places=2) = 0.0
@@ -48,7 +48,14 @@ class UpdatePassword(BaseModel):
 # Main User model with all properties
 class User(UserBase):
     id: int
-    registration_date: date
+    registration_date: datetime
+
+
+class UserRegisterRequest(BaseModel):
+    email: str
+    phone_number: str
+    name: str
+    password: str
 
 
 # Shared properties for saved credit card
