@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import items, register
+from app.api.routes import items, registration
 
 api_router = APIRouter()
 
