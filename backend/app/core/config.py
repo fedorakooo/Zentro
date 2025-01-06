@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Project base directory
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).parent.parent.parent
 
 
 class DbSettings(BaseModel):
@@ -23,7 +23,6 @@ class DbSettings(BaseModel):
 
 
 class Settings(BaseSettings):
-
     db: DbSettings = DbSettings()
 
 
