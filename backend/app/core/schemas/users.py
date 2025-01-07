@@ -58,6 +58,11 @@ class UserRegisterRequest(BaseModel):
     password: str
 
 
+class UserLoginRequest(BaseModel):
+    phone_number: EmailStr
+    password: str
+
+
 # Shared properties for saved credit card
 class SavedCardBase(BaseModel):
     card_number: str

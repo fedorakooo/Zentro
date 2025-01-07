@@ -1,44 +1,45 @@
-import hashlib
+import string
+import random
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
+
 from app.core.models.users import users_table
-import random
-import string
+from app.services.password_handler import hash_password
 
 
 async def register_user(db: AsyncSession, email: str, phone_number: str, name: str, password: str):
-    async with db.begin():
-        result = await db.execute(select(users_table).filter(users_table.c.email == email))
-        existing_user = result.scalars().first()
-        if existing_user:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email is already registered"
-            )
+    result = await db.execute(select(users_table).filter(users_table.c.email == email))
+    existing_user = result.scalars().first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is already registered"
+        )
 
-        result = await db.execute(select(users_table).filter(users_table.c.phone_number == phone_number))
-        existing_user = result.scalars().first()
-        if existing_user:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Phone number is already registered"
-            )
+    result = await db.execute(select(users_table).filter(users_table.c.phone_number == phone_number))
+    existing_user = result.scalars().first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Phone number is already registered"
+        )
 
-        referral_code = generate_referral_code()
+    referral_code = generate_referral_code()
 
-        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    hashed_password = hash_password(password)
 
-        new_user_data = {
-            "email": email,
-            "name": name,
-            "phone_number": phone_number,
-            "hashed_password": hashed_password,
-            "referral_code": referral_code,
-        }
+    new_user_data = {
+        "email": email,
+        "name": name,
+        "phone_number": phone_number,
+        "hashed_password": hashed_password,
+        "referral_code": referral_code,
+    }
 
-        await db.execute(users_table.insert().values(new_user_data))
+    await db.execute(users_table.insert().values(new_user_data))
 
     try:
         await db.commit()
@@ -50,6 +51,7 @@ async def register_user(db: AsyncSession, email: str, phone_number: str, name: s
         )
 
     return {"message": "User registered successfully", "email": email}
+
 
 def generate_referral_code(length=8):
     letters_and_digits = string.ascii_uppercase + string.digits
