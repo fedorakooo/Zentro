@@ -19,11 +19,6 @@ class UserBase(BaseModel):
     gender: Optional[str] = None
 
 
-# Properties to receive via API when creating a user
-class UserCreate(UserBase):
-    hashed_password: str
-
-
 # Properties to receive via API when updating user details, all are optional
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
@@ -51,6 +46,7 @@ class User(UserBase):
     registration_date: datetime
 
 
+# Properties to receive via API when creating a user
 class UserRegisterRequest(BaseModel):
     email: Optional[EmailStr] = None
     phone_number: str
