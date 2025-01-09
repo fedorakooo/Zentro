@@ -1,6 +1,6 @@
 from sqlalchemy.future import select
 from fastapi import HTTPException, status
-from app.core.db import get_db
+from app.dependencies.db import get_db
 from app.core.models.users import users_table
 from app.services import password_handler as auth_utils
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from app.core.db import get_db
+from app.dependencies.db import get_db
 from app.core.schemas.users import UserRegisterRequest
 from app.services.registration import register_user
 
