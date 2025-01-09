@@ -52,14 +52,14 @@ class User(UserBase):
 
 
 class UserRegisterRequest(BaseModel):
-    email: str
+    email: Optional[EmailStr] = None
     phone_number: str
     name: str
     password: str
 
 
 class UserLoginRequest(BaseModel):
-    phone_number: EmailStr
+    phone_number: str
     password: str
 
 
