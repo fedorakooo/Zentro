@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, HTTPException
 
 from app.core.db import get_db
 from app.core.schemas.users import UserRegisterRequest
@@ -9,7 +8,7 @@ router = APIRouter(tags=["Registration"])
 
 
 @router.post("/register")
-async def register(request: UserRegisterRequest, db: AsyncSession = Depends(get_db)):
+async def register(request: UserRegisterRequest):
     async with get_db() as db:
         try:
             response = await register_user(db, request.email, request.phone_number, request.name, request.password)
