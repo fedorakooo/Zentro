@@ -3,8 +3,7 @@ from fastapi import HTTPException, status, Depends
 from sqlalchemy import select, Row
 
 from app.dependencies.db import get_db
-from app.core.models.users import users_table
-from app.core.schemas.users import User
+from app.core.models.users import User
 from app.dependencies.auth import get_current_token_payload_user
 
 
@@ -24,19 +23,14 @@ async def get_current_active_auth_user(
 
 async def get_user_by_phone_number(phone_number: str) -> User:
     async with get_db() as db:
-        query = select(users_table).where(users_table.c.phone_number == phone_number)
+        query = select(User).where(User.phone_number == phone_number)
         result = await db.execute(query)
-        row: Optional[Row] = result.fetchone()
+        user = result.scalars().first()
 
-        if not row:
+        if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="user not found"
+                detail="User not found"
             )
 
-        # Convert SQLAlchemy Row to dict
-        user_data: dict = row._asdict()
-
-        user: User = User(**user_data)
-
-        return user
+    return user

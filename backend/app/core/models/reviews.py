@@ -1,21 +1,23 @@
 from sqlalchemy import (
-    Table, Column, Integer, String, DateTime, MetaData, ForeignKey
+    Column, Integer, String, DateTime, ForeignKey
 )
 from sqlalchemy.sql import expression
 
-from app.core.models.users import users_table
-from app.core.models.products import products_table
+from app.core.db import Base
 
-metadata = MetaData()
 
-reviews_table = Table(
-    "reviews",
-    metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("user_id", Integer, ForeignKey(users_table.c.id), nullable=False),
-    Column("product_id", Integer, ForeignKey(products_table.c.id), nullable=False),
-    Column("rating", Integer, nullable=False),
-    Column("comment", String(1000), nullable=True),
-    Column("created_at", DateTime, server_default=expression.func.now(), nullable=False),
-    Column("updated_at", DateTime, server_default=expression.func.now(), onupdate=expression.func.now(), nullable=False)
-)
+class Review(Base):
+    __tablename__ = "reviews"
+
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+    user_id: int = Column(Integer, ForeignKey("users.id"), nullable=False)
+    product_id: int = Column(Integer, ForeignKey("products.id"), nullable=False)
+    rating: int = Column(Integer, nullable=False)
+    comment: str = Column(String(1000), nullable=True)
+    created_at: DateTime = Column(DateTime, server_default=expression.func.now(), nullable=False)
+    updated_at: DateTime = Column(
+        DateTime,
+        server_default=expression.func.now(),
+        onupdate=expression.func.now(),
+        nullable=False
+    )

@@ -1,44 +1,58 @@
+from datetime import datetime
+
 from sqlalchemy import (
-    Table, Column, Integer, String, Boolean, Float, DateTime, MetaData, ForeignKey, JSON
+    Column, Integer, String, Boolean, DateTime, ForeignKey, JSON, Numeric
 )
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import expression
 
-metadata = MetaData()
+from app.core.db import Base
 
-categories_table = Table(
-    "categories",
-    metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("name", String(100), nullable=False, unique=True),
-    Column("parent_id", Integer, ForeignKey("categories.id"), nullable=True),
-    Column("created_at", DateTime, server_default=expression.func.now(), nullable=False),
-    Column("updated_at", DateTime, server_default=expression.func.now(), onupdate=expression.func.now(), nullable=False),
-)
 
-products_table = Table(
-    "products",
-    metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("manufacturer", String(150), nullable=False),
-    Column("name", String(150), nullable=False),
-    Column("description", String(1000), nullable=True),
-    Column("attributes", JSON, nullable=True),
-    Column("price", Float, nullable=False),
-    Column("category_id", Integer, ForeignKey(categories_table.c.id), nullable=False),
-    Column("quantity_in_stock", Integer, default=0, nullable=False),
-    Column("image_url", String(300), nullable=True),
-    Column("is_active", Boolean(), server_default="true", nullable=False),
-    Column("created_at", DateTime, server_default=expression.func.now(), nullable=False),
-    Column("updated_at", DateTime, server_default=expression.func.now(), onupdate=expression.func.now(), nullable=False),
-)
+class Category(Base):
+    __tablename__ = "categories"
 
-product_sizes_table = Table(
-    "product_sizes",
-    metadata,
-    Column("id", Integer, primary_key=True, autoincrement=True),
-    Column("product_id", Integer, ForeignKey(products_table.c.id), nullable=False),
-    Column("size", String(50), nullable=False),
-    Column("quantity", Integer, default=0, nullable=False),
-    Column("created_at", DateTime, server_default=expression.func.now(), nullable=False),
-    Column("updated_at", DateTime, server_default=expression.func.now(), onupdate=expression.func.now(), nullable=False),
-)
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+    name: str = Column(String(100), nullable=False, unique=True)
+    parent_id: int = Column(Integer, ForeignKey("categories.id"), nullable=True)
+    created_at: datetime = Column(DateTime, server_default=expression.func.now(), nullable=False)
+    updated_at: datetime = Column(DateTime, server_default=expression.func.now(), nullable=False)
+
+
+class Product(Base):
+    __tablename__ = "products"
+
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+    manufacturer: str = Column(String(150), nullable=False)
+    name: str = Column(String(150), nullable=False)
+    description: str = Column(String(1000), nullable=True)
+    attributes: dict = Column(JSON, nullable=True)
+    price: float = Column(Numeric(precision=10, scale=2), nullable=False)
+    seller_id: int = Column(Integer, ForeignKey("users.id"), nullable=False)
+    category_id: int = Column(Integer, ForeignKey("categories.id"), nullable=False)
+    quantity_in_stock: int = Column(Integer, default=0, nullable=False)
+    image_url: str = Column(String(300), nullable=True)
+    is_active: bool = Column(Boolean(), server_default="true", nullable=False)
+    created_at: DateTime = Column(DateTime, server_default=expression.func.now(), nullable=False)
+    updated_at: DateTime = Column(
+        DateTime,
+        server_default=expression.func.now(),
+        onupdate=expression.func.now(),
+        nullable=False
+    )
+
+
+class ProductSize(Base):
+    __tablename__ = "product_sizes"
+
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+    product_id: int = Column(Integer, ForeignKey("products.id"), nullable=False)
+    size: str = Column(String(50), nullable=False)
+    quantity: int = Column(Integer, default=0, nullable=False)
+    created_at: DateTime = Column(DateTime, server_default=expression.func.now(), nullable=False)
+    updated_at: DateTime = Column(
+        DateTime,
+        server_default=expression.func.now(),
+        onupdate=expression.func.now(),
+        nullable=False
+    )

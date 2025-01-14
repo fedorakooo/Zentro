@@ -1,17 +1,17 @@
 import string
 import random
 
+from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 
-from app.core.models.users import users_table
+from app.core.models.users import User
 from app.services.password_handler import hash_password
 
 
 async def register_user(db: AsyncSession, email: str, phone_number: str, name: str, password: str):
-    result = await db.execute(select(users_table).filter(users_table.c.email == email))
+    result = await db.execute(select(User).filter(User.email == email))
     existing_user = result.scalars().first()
     if existing_user:
         raise HTTPException(
@@ -19,7 +19,7 @@ async def register_user(db: AsyncSession, email: str, phone_number: str, name: s
             detail="Email is already registered"
         )
 
-    result = await db.execute(select(users_table).filter(users_table.c.phone_number == phone_number))
+    result = await db.execute(select(User).filter(User.phone_number == phone_number))
     existing_user = result.scalars().first()
     if existing_user:
         raise HTTPException(
@@ -39,7 +39,7 @@ async def register_user(db: AsyncSession, email: str, phone_number: str, name: s
         "referral_code": referral_code,
     }
 
-    await db.execute(users_table.insert().values(new_user_data))
+    await db.execute(insert(User).values(new_user_data))
 
     try:
         await db.commit()
