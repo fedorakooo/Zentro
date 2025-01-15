@@ -45,6 +45,9 @@ class User(UserBase):
     id: int
     registration_date: datetime
 
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
 # Properties to receive via API when creating a user
 class UserRegisterRequest(BaseModel):
