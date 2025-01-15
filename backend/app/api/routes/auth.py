@@ -10,7 +10,7 @@ router = APIRouter(tags=["Authentication"])
 @router.post("/login/", response_model=TokenInfo)
 async def auth_user(user: UserLoginRequest = Depends(validate_auth_users)):
     jwt_payload = {
-        "phone_number": user.phone_number
+        "username": user.phone_number
     }
     token = jwt_manager.encode_jwt(jwt_payload)
     return TokenInfo(

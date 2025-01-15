@@ -10,7 +10,7 @@ from app.dependencies.auth import get_current_token_payload_user
 async def get_current_active_auth_user(
         payload: dict = Depends(get_current_token_payload_user)
 ) -> User:
-    phone_number: Optional[str] = payload.get("phone_number")
+    phone_number: Optional[str] = payload.get("username")
     if not phone_number:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

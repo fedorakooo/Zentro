@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, condecimal, Field
+from pydantic import BaseModel, EmailStr, condecimal
 from datetime import datetime
 from typing import Optional
 
