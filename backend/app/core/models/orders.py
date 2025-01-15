@@ -1,7 +1,6 @@
 from sqlalchemy import (
     Column, String, DateTime, ForeignKey, Integer, Numeric
 )
-from sqlalchemy.orm import relationship
 from sqlalchemy.sql import expression
 
 from app.core.db import Base
