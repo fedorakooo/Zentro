@@ -52,6 +52,7 @@ class UserRegisterRequest(BaseModel):
     phone_number: str
     name: str
     password: str
+    is_seller: Optional[bool] = None
 
 
 class UserLoginRequest(BaseModel):

@@ -7,11 +7,12 @@ from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 
 from app.core.models.users import User
+from app.core.schemas.users import UserRegisterRequest
 from app.services.password_handler import hash_password
 
 
-async def register_user(db: AsyncSession, email: str, phone_number: str, name: str, password: str):
-    result = await db.execute(select(User).filter(User.email == email))
+async def register_user(db: AsyncSession, user: UserRegisterRequest):
+    result = await db.execute(select(User).filter(User.email == user.email))
     existing_user = result.scalars().first()
     if existing_user:
         raise HTTPException(
@@ -19,7 +20,7 @@ async def register_user(db: AsyncSession, email: str, phone_number: str, name: s
             detail="Email is already registered"
         )
 
-    result = await db.execute(select(User).filter(User.phone_number == phone_number))
+    result = await db.execute(select(User).filter(User.phone_number == user.phone_number))
     existing_user = result.scalars().first()
     if existing_user:
         raise HTTPException(
@@ -29,12 +30,10 @@ async def register_user(db: AsyncSession, email: str, phone_number: str, name: s
 
     referral_code = generate_referral_code()
 
-    hashed_password = hash_password(password)
+    hashed_password = hash_password(user.password)
 
-    new_user_data = {
-        "email": email,
-        "name": name,
-        "phone_number": phone_number,
+    return {
+        **user.dict(exclude={"password"}),
         "hashed_password": hashed_password,
         "referral_code": referral_code,
     }
@@ -50,7 +49,7 @@ async def register_user(db: AsyncSession, email: str, phone_number: str, name: s
             detail="Error occurred during user registration.",
         )
 
-    return {"message": "User registered successfully", "email": email}
+    return {"message": "User registered successfully", "phone_number": user.phone_number}
 
 
 def generate_referral_code(length=8):

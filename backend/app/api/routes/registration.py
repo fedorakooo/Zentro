@@ -11,7 +11,7 @@ router = APIRouter(tags=["Registration"])
 async def register(request: UserRegisterRequest):
     async with get_db() as db:
         try:
-            response = await register_user(db, request.email, request.phone_number, request.name, request.password)
+            response = await register_user(db, request)
             return response
         except HTTPException as e:
             raise e
