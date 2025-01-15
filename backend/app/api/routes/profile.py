@@ -9,5 +9,5 @@ router = APIRouter(tags=["Profile"])
 
 
 @router.get("/profile/")
-def get_profile(user: User = Depends(get_current_active_auth_user)):
+async def get_profile(user: User = Depends(get_current_active_auth_user)):
     return jsonable_encoder(user)
