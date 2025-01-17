@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 from app.dependencies.db import get_db
 from app.core.schemas.users import User
-from app.core.models.users import User as User_DB
+from app.core.models.users import UserORM
 from app.dependencies.auth import get_current_token_payload_user
 
 
@@ -26,7 +26,7 @@ async def get_current_active_auth_user(
 
 async def get_user_by_phone_number(phone_number: str) -> User:
     async with get_db() as db:
-        query = select(User_DB).where(User_DB.phone_number == phone_number)
+        query = select(UserORM).where(UserORM.phone_number == phone_number)
         result = await db.execute(query)
         user_db = result.scalars().first()
 

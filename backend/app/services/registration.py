@@ -6,13 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 
-from app.core.models.users import User
+from app.core.models.users import UserORM
 from app.core.schemas.users import UserRegisterRequest
 from app.services.password_handler import hash_password
 
 
 async def register_user(db: AsyncSession, user: UserRegisterRequest):
-    result = await db.execute(select(User).filter(User.email == user.email))
+    result = await db.execute(select(UserORM).filter(UserORM.email == user.email))
     existing_user = result.scalars().first()
     if existing_user:
         raise HTTPException(
@@ -20,7 +20,7 @@ async def register_user(db: AsyncSession, user: UserRegisterRequest):
             detail="Email is already registered"
         )
 
-    result = await db.execute(select(User).filter(User.phone_number == user.phone_number))
+    result = await db.execute(select(UserORM).filter(UserORM.phone_number == user.phone_number))
     existing_user = result.scalars().first()
     if existing_user:
         raise HTTPException(
@@ -32,13 +32,13 @@ async def register_user(db: AsyncSession, user: UserRegisterRequest):
 
     hashed_password = hash_password(user.password)
 
-    return {
+    new_user_data = {
         **user.dict(exclude={"password"}),
         "hashed_password": hashed_password,
         "referral_code": referral_code,
     }
 
-    await db.execute(insert(User).values(new_user_data))
+    await db.execute(insert(UserORM).values(new_user_data))
 
     try:
         await db.commit()

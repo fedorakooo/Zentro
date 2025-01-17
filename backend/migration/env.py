@@ -9,11 +9,11 @@ from alembic import context
 
 from app.core.db import DATABASE_URL, Base
 
-from app.core.models.users import User, SavedCard
-from app.core.models.products import Product, ProductSize, Category
-from app.core.models.orders import Order, OrderProduct
-from app.core.models.reviews import Review
-from app.core.models.cart import Cart
+from app.core.models.users import UserORM, SavedCardORM
+from app.core.models.products import ProductORM, ProductSizeORM, CategoryORM
+from app.core.models.orders import OrderORM, OrderProductORM
+from app.core.models.reviews import ReviewORM
+from app.core.models.cart import CartORM
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -23,11 +23,11 @@ config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 target_metadata = Base.metadata
 
-
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
 
 # add your model's MetaData object here
 # for 'autogenerate' support

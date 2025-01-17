@@ -3,7 +3,7 @@ from fastapi import HTTPException, status, Form
 
 from app.core.schemas.users import UserLoginRequest
 from app.dependencies.db import get_db
-from app.core.models.users import User
+from app.core.models.users import UserORM
 from app.services import password_handler as auth_utils
 
 
@@ -18,7 +18,7 @@ async def validate_auth_users(
 
     async with get_db() as db:
         # User login occurs using a phone number as username
-        query = select(User).where(username == User.phone_number)
+        query = select(UserORM).where(username == UserORM.phone_number)
         result = await db.execute(query)
         user = result.scalars().first()
 

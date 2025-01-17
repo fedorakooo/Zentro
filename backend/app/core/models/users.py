@@ -6,7 +6,7 @@ from sqlalchemy.orm import mapped_column, Mapped
 from app.core.db import Base
 
 
-class User(Base):
+class UserORM(Base):
     __tablename__ = "users"
 
     email: Mapped[str] = mapped_column(String(100), unique=True, index=True, nullable=True)
@@ -23,7 +23,7 @@ class User(Base):
     gender: Mapped[str] = mapped_column(String(1), nullable=True)
 
 
-class SavedCard(Base):
+class SavedCardORM(Base):
     __tablename__ = "saved_cards"
 
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)

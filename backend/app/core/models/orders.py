@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.db import Base
 
 
-class Order(Base):
+class OrderORM(Base):
     __tablename__ = "orders"
 
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False, index=True)
@@ -16,7 +16,7 @@ class Order(Base):
     payment_method: Mapped[str] = mapped_column(String(50), nullable=False)
 
 
-class OrderProduct(Base):
+class OrderProductORM(Base):
     __tablename__ = "order_products"
 
     order_id: Mapped[int] = mapped_column(Integer, ForeignKey("orders.id"), nullable=False)
