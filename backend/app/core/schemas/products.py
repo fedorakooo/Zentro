@@ -8,6 +8,7 @@ class ProductBase(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
+    seller_id: int
     category_id: int
     quantity_in_stock: int
     image_url: str
@@ -32,6 +33,7 @@ class ProductCreate(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
+    seller_id: int
     category_id: int
     quantity_in_stock: int
     image_url: str
