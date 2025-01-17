@@ -8,10 +8,12 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 from app.core.db import DATABASE_URL, Base
+
 from app.core.models.users import User, SavedCard
 from app.core.models.products import Product, ProductSize, Category
 from app.core.models.orders import Order, OrderProduct
 from app.core.models.reviews import Review
+from app.core.models.cart import Cart
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
