@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.dependencies.db import get_db
 from app.core.schemas.users import UserRegisterRequest
-from app.services.registration import register_user
+from app.services.users.registration import register_user
 
 router = APIRouter(tags=["Registration"])
 

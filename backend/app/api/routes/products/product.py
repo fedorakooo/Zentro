@@ -4,8 +4,8 @@ from fastapi.params import Depends
 from app.core.schemas.cart import CartItemRequest
 from app.core.schemas.products import Product
 from app.core.schemas.users import User
-from app.services.product import get_product_by_id, add_item_to_cart
-from app.services.user import get_current_active_auth_user
+from app.services.products.product import get_product_by_id, add_item_to_cart
+from app.services.users.user import get_current_active_auth_user
 
 router = APIRouter(tags=["Product"], prefix="/products")
 

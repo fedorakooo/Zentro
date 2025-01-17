@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends
 from app.core.schemas.auth import TokenInfo
-from app.services.auth import validate_auth_users
+from app.services.auth import validate_auth_users, jwt_manager
 from app.core.schemas.users import UserLoginRequest
-from app.services import jwt_manager
 
 router = APIRouter(tags=["Authentication"])
 

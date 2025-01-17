@@ -3,9 +3,9 @@ from fastapi.params import Depends
 from fastapi.encoders import jsonable_encoder
 
 from app.core.schemas.users import User
-from app.services.user import get_current_active_auth_user
+from app.services.users.user import get_current_active_auth_user
 
-router = APIRouter(tags=["Profile"], prefix="/profile")
+router = APIRouter(tags=["Profile"], prefix="/user")
 
 
 @router.get("/")
