@@ -6,7 +6,8 @@ from typing import Optional
 # Shared properties for order, base class for common order attributes
 class OrderBase(BaseModel):
     user_id: int
-    order_date: datetime
+    created_at: datetime
+    updated_at: datetime
     total_amount: condecimal(gt=0)  # Ensure total amount is greater than zero
     status: str
     shipping_address: Optional[str] = None
