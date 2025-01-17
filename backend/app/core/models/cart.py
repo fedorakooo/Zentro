@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.db import Base
 
 
-class Cart(Base):
+class CartORM(Base):
     __tablename__ = "cart"
 
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
