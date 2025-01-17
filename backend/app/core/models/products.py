@@ -1,9 +1,7 @@
-from datetime import datetime
-
 from sqlalchemy import (
-    Column, Integer, String, Boolean, DateTime, ForeignKey, JSON, Numeric
+    Boolean, ForeignKey, JSON, Numeric, String, Integer
 )
-from sqlalchemy.sql import expression
+from sqlalchemy.orm import mapped_column, Mapped
 
 from app.core.db import Base
 
@@ -11,47 +9,29 @@ from app.core.db import Base
 class Category(Base):
     __tablename__ = "categories"
 
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    name: str = Column(String(100), nullable=False, unique=True)
-    parent_id: int = Column(Integer, ForeignKey("categories.id"), nullable=True)
-    created_at: datetime = Column(DateTime, server_default=expression.func.now(), nullable=False)
-    updated_at: datetime = Column(DateTime, server_default=expression.func.now(), nullable=False)
+    name: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    parent_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=True)
 
 
 class Product(Base):
     __tablename__ = "products"
 
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    manufacturer: str = Column(String(150), nullable=False)
-    name: str = Column(String(150), nullable=False)
-    description: str = Column(String(1000), nullable=True)
-    attributes: dict = Column(JSON, nullable=True)
-    price: float = Column(Numeric(precision=10, scale=2), nullable=False)
-    seller_id: int = Column(Integer, ForeignKey("users.id"), nullable=False)
-    category_id: int = Column(Integer, ForeignKey("categories.id"), nullable=False)
-    quantity_in_stock: int = Column(Integer, default=0, nullable=False)
-    image_url: str = Column(String(300), nullable=True)
-    is_active: bool = Column(Boolean(), server_default="true", nullable=False)
-    created_at: DateTime = Column(DateTime, server_default=expression.func.now(), nullable=False)
-    updated_at: DateTime = Column(
-        DateTime,
-        server_default=expression.func.now(),
-        onupdate=expression.func.now(),
-        nullable=False
-    )
+    manufacturer: Mapped[str] = mapped_column(String(150), nullable=False)
+    name: Mapped[str] = mapped_column(String(150), nullable=False)
+    description: Mapped[str] = mapped_column(String(1000), nullable=True)
+    attributes: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    price: Mapped[float] = mapped_column(Numeric(precision=10, scale=2), nullable=False)
+    seller_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=False)
+    quantity_in_stock: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    image_url: Mapped[str] = mapped_column(String(300), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean(), server_default="true", nullable=False)
 
 
 class ProductSize(Base):
     __tablename__ = "product_sizes"
 
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    product_id: int = Column(Integer, ForeignKey("products.id"), nullable=False)
-    size: str = Column(String(50), nullable=False)
-    quantity: int = Column(Integer, default=0, nullable=False)
-    created_at: DateTime = Column(DateTime, server_default=expression.func.now(), nullable=False)
-    updated_at: DateTime = Column(
-        DateTime,
-        server_default=expression.func.now(),
-        onupdate=expression.func.now(),
-        nullable=False
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey("products.id"), nullable=False)
+    size: Mapped[str] = mapped_column(String(50), nullable=False)
+    quantity: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
