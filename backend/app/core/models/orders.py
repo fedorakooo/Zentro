@@ -1,27 +1,24 @@
 from sqlalchemy import (
-    Column, String, DateTime, ForeignKey, Integer, Numeric
+    String, ForeignKey, Numeric, Integer
 )
-from sqlalchemy.sql import expression
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base
 
 
 class Order(Base):
-    __tablename__ = 'orders'
+    __tablename__ = "orders"
 
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    user_id: int = Column(Integer, ForeignKey("users.id"), nullable=False)
-    order_date: str = Column(DateTime, server_default=expression.func.now(), nullable=False)
-    total_amount: float = Column(Numeric(precision=10, scale=2), nullable=False)
-    status: str = Column(String(50), nullable=False)
-    shipping_address: str = Column(String(300), nullable=False)
-    payment_method: str = Column(String(50), nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    total_amount: Mapped[float] = mapped_column(Numeric(precision=10, scale=2), nullable=False)
+    status: Mapped[str] = mapped_column(String(50), nullable=False)
+    shipping_address: Mapped[str] = mapped_column(String(300), nullable=False)
+    payment_method: Mapped[str] = mapped_column(String(50), nullable=False)
 
 
 class OrderProduct(Base):
     __tablename__ = "order_products"
 
-    id: int = Column(Integer, primary_key=True, autoincrement=True)
-    order_id: int = Column(Integer, ForeignKey("orders.id"), nullable=False)
-    product_id: int = Column(Integer, ForeignKey("products.id"), nullable=False)
-    quantity: int = Column(Integer, nullable=False)
+    order_id: Mapped[int] = mapped_column(Integer, ForeignKey("orders.id"), nullable=False)
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey("products.id"), nullable=False)
+    quantity: Mapped[int] = mapped_column(Integer, nullable=False)
