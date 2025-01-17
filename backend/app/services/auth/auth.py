@@ -4,7 +4,7 @@ from fastapi import HTTPException, status, Form
 from app.core.schemas.users import UserLoginRequest
 from app.dependencies.db import get_db
 from app.core.models.users import UserORM
-from app.services import password_handler as auth_utils
+from app.services.auth import password_handler as auth_utils
 
 
 async def validate_auth_users(

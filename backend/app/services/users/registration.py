@@ -8,7 +8,7 @@ from fastapi import HTTPException, status
 
 from app.core.models.users import UserORM
 from app.core.schemas.users import UserRegisterRequest
-from app.services.password_handler import hash_password
+from app.services.auth.password_handler import hash_password
 
 
 async def register_user(db: AsyncSession, user: UserRegisterRequest):
