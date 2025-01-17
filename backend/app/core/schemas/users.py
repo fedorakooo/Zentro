@@ -11,7 +11,8 @@ class UserBase(BaseModel):
     is_active: bool = True
     is_seller: bool = False
     balance: condecimal(max_digits=10, decimal_places=2) = 0.0
-    registration_date: datetime
+    created_at: datetime
+    updated_at: datetime
     address: Optional[str] = None
     loyalty_points: condecimal(max_digits=10, decimal_places=2) = 0.0
     profile_picture_url: Optional[str] = None
@@ -43,7 +44,6 @@ class UpdatePassword(BaseModel):
 # Main User model with all properties
 class User(UserBase):
     id: int
-    registration_date: datetime
 
     class Config:
         orm_mode = True
@@ -67,7 +67,8 @@ class UserLoginRequest(BaseModel):
 class SavedCardBase(BaseModel):
     card_number: str
     card_type: str
-    expiry_date: datetime
+    created_at: datetime
+    updated_at: datetime
     card_holder_name: str
     is_default: bool = False
 
