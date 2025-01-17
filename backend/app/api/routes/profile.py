@@ -5,9 +5,9 @@ from fastapi.encoders import jsonable_encoder
 from app.core.schemas.users import User
 from app.services.user import get_current_active_auth_user
 
-router = APIRouter(tags=["Profile"])
+router = APIRouter(tags=["Profile"], prefix="/profile")
 
 
-@router.get("/profile/")
+@router.get("/")
 async def get_profile(user: User = Depends(get_current_active_auth_user)):
     return jsonable_encoder(user)
