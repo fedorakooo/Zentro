@@ -42,6 +42,10 @@ class ProductCreate(BaseModel):
 class Product(ProductBase):
     id: int
 
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
 
 class ProductSizeBase(BaseModel):
     product_id: int
@@ -62,5 +66,3 @@ class ProductSize(ProductSizeBase):
     id: int
     created_at: datetime
     updated_at: datetime
-
-
