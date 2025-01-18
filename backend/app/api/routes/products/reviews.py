@@ -1,0 +1,26 @@
+from fastapi import APIRouter, Depends
+
+from app.core.schemas.reviews import ReviewCreate
+from app.core.schemas.users import User
+from app.services.products.reviews import add_review_about_product
+from app.services.users.user import get_current_active_auth_user
+
+router = APIRouter(tags=["Reviews"])
+
+@router.post("/{product_id}/add_review")
+async def add_product_review(
+        product_id: int,
+        rating: int,
+        comment: str,
+        user: User = Depends(get_current_active_auth_user)
+):
+    review = ReviewCreate(
+        user_id=user.id,
+        product_id=product_id,
+        rating=rating,
+        comment=comment
+    )
+
+    result = await add_review_about_product(review)
+
+    return result

@@ -6,8 +6,11 @@ from app.core.schemas.products import Product
 from app.core.schemas.users import User
 from app.services.products.product import get_product_by_id, add_item_to_cart
 from app.services.users.user import get_current_active_auth_user
+from app.api.routes.products.reviews import router as reviews_router
 
 router = APIRouter(tags=["Product"], prefix="/products")
+
+router.include_router(reviews_router)
 
 
 @router.get("/{product_id}")
@@ -26,5 +29,7 @@ async def add_product_to_cart(
         user_id=user.id,
         product_id=product_id,
         quantity=quantity)
+
     result = await add_item_to_cart(cart_item)
+
     return result

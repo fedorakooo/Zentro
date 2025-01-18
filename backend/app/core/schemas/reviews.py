@@ -13,12 +13,6 @@ class ReviewBase(BaseModel):
     updated_at: datetime
 
 
-# Properties to receive via API when updating review details, all are optional
-class ReviewUpdate(BaseModel):
-    rating: Optional[conint(ge=1, le=5)] = None
-    comment: Optional[str] = None
-
-
 # Properties to receive via API when creating a review
 class ReviewCreate(BaseModel):
     user_id: int
