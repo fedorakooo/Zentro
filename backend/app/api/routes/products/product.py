@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Form
 from fastapi.params import Depends
 
 from app.core.schemas.cart import CartItemRequest
@@ -22,13 +22,14 @@ async def get_product(product_id: int) -> Product:
 @router.post("/{product_id}")
 async def add_product_to_cart(
         product_id: int,
-        quantity: int,
+        quantity: int = Form(...),
         user: User = Depends(get_current_active_auth_user)
 ):
     cart_item: CartItemRequest = CartItemRequest(
         user_id=user.id,
         product_id=product_id,
-        quantity=quantity)
+        quantity=quantity
+    )
 
     result = await add_item_to_cart(cart_item)
 

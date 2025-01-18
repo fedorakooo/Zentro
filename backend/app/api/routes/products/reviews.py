@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Form
+from pydantic import conint
 
 from app.core.schemas.reviews import ReviewCreate
 from app.core.schemas.users import User
@@ -10,8 +11,8 @@ router = APIRouter(tags=["Reviews"])
 @router.post("/{product_id}/add_review")
 async def add_product_review(
         product_id: int,
-        rating: int,
-        comment: str,
+        rating: conint(ge=1, le=5) = Form(...),
+        comment: str = Form(...),
         user: User = Depends(get_current_active_auth_user)
 ):
     review = ReviewCreate(
