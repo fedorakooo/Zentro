@@ -17,7 +17,10 @@ async def get_product_by_id(product_id: int) -> Product:
     product_db = result.scalars().one_or_none()
 
     if not product_db:
-        raise HTTPException(status_code=404, detail="Product not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Product not found"
+        )
 
     product = Product.from_orm(product_db)
 
@@ -37,18 +40,15 @@ async def add_item_to_cart(cart_item: CartItemRequest):
         if cart_item_db:
             cart_item_db.quantity += cart_item.quantity
             return {
-                "message": "Product added to cart"
+                "message": "Product added to cart successfully"
             }
 
-        new_cart_item = CartORM(
-            user_id=cart_item.user_id,
-            product_id=cart_item.product_id,
-            quantity=cart_item.quantity
-        )
+        new_cart_item = CartORM(**cart_item.dict())
+
         db.add(new_cart_item)
         db.commit()
         db.refresh(new_cart_item)
 
         return {
-            "message": "Product added to cart"
+            "message": "Product added to cart successfully"
         }
