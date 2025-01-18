@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends
+
 from app.core.schemas.auth import TokenInfo
-from app.services.auth import validate_auth_users, jwt_manager
+from app.services.auth.jwt_manager import encode_jwt
 from app.core.schemas.users import UserLoginRequest
+from app.services.auth.auth import validate_auth_users
 
 router = APIRouter(tags=["Authentication"])
 
@@ -11,7 +13,7 @@ async def auth_user(user: UserLoginRequest = Depends(validate_auth_users)):
     jwt_payload = {
         "username": user.phone_number
     }
-    token = jwt_manager.encode_jwt(jwt_payload)
+    token = encode_jwt(jwt_payload)
     return TokenInfo(
         access_token=token,
         token_type="Bearer"
