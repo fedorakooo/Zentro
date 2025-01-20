@@ -38,3 +38,12 @@ async def get_user_by_phone_number(phone_number: str) -> User:
 
     user = User.from_orm(user_db)
     return user
+
+
+def check_seller_permissions(user: User = Depends(get_current_active_auth_user)):
+    if not user.is_seller:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You must be a seller to perform this action"
+        )
+    return user

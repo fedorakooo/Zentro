@@ -16,7 +16,6 @@ class CategoryORM(Base):
 class ProductORM(Base):
     __tablename__ = "products"
 
-    manufacturer: Mapped[str] = mapped_column(String(150), nullable=False)
     name: Mapped[str] = mapped_column(String(150), nullable=False)
     description: Mapped[str] = mapped_column(String(1000), nullable=True)
     attributes: Mapped[dict | None] = mapped_column(JSON, nullable=True)

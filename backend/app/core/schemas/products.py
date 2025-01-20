@@ -32,12 +32,14 @@ class ProductUpdate(BaseModel):
 class ProductCreate(BaseModel):
     name: str
     description: Optional[str] = None
+    attributes: Optional[dict] = None
     price: float
-    seller_id: int
     category_id: int
     quantity_in_stock: int
     image_url: str
-    is_active: bool
+
+class ProductCreateDB(ProductCreate):
+    seller_id: int
 
 
 # Main Product model with all properties
