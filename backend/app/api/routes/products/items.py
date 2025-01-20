@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-router = APIRouter(tags=["items"])
+router = APIRouter(tags=["Items"])
 
 @router.get("/")
 def read_items():
