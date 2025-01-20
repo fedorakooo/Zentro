@@ -5,7 +5,7 @@ from app.core.schemas.cart import CartItemRequest
 from app.core.schemas.products import Product, ProductCreate, ProductCreateDB
 from app.core.schemas.users import User
 from app.services.products.product import get_product_by_id, add_item_to_cart, add_new_product
-from app.services.user.user import get_current_active_auth_user
+from app.services.user.user import get_current_active_auth_user, check_seller_permissions
 from app.api.routes.products.reviews import router as reviews_router
 
 router = APIRouter(tags=["Product"], prefix="/products")
@@ -36,7 +36,7 @@ async def add_product_to_cart(
     return result
 
 @router.post("/create")
-async def create_product(product: ProductCreate, user: User = Depends(get_current_active_auth_user)):
+async def create_product(product: ProductCreate, user: User = Depends(check_seller_permissions)):
     new_product: ProductCreateDB = ProductCreateDB(**product.dict(), seller_id=user.id)
 
     result = await add_new_product(new_product)
