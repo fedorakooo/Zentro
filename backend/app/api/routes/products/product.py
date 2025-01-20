@@ -5,7 +5,7 @@ from app.core.schemas.cart import CartItemRequest
 from app.core.schemas.products import Product, ProductCreate, ProductCreateDB
 from app.core.schemas.users import User
 from app.services.products.product import get_product_by_id, add_item_to_cart, add_new_product
-from app.services.users.user import get_current_active_auth_user
+from app.services.user.user import get_current_active_auth_user
 from app.api.routes.products.reviews import router as reviews_router
 
 router = APIRouter(tags=["Product"], prefix="/products")
