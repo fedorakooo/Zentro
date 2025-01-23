@@ -19,6 +19,7 @@ async def get_created_products_by_user_id(user_id) -> List[Product]:
             products = [Product.from_orm(product_db) for product_db in products_db]
 
             return products
+
         except SQLAlchemyError as e:
             raise HTTPException(
                 status_code=500,

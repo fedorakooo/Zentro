@@ -1,5 +1,5 @@
-from sqlalchemy.future import select
 from fastapi import HTTPException, status, Form
+from sqlalchemy import select
 
 from app.core.schemas.users import UserLoginRequest
 from app.dependencies.db import get_db
@@ -20,7 +20,7 @@ async def validate_auth_users(
         # User login occurs using a phone number as username
         query = select(UserORM).where(username == UserORM.phone_number)
         result = await db.execute(query)
-        user = result.scalars().first()
+        user = result.scalars().one_or_none()
 
         if not user:
             raise unauthed_exc

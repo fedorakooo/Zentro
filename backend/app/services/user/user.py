@@ -1,6 +1,7 @@
 from typing import Optional
 from fastapi import HTTPException, status, Depends
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.dependencies.db import get_db
 from app.core.schemas.users import User
@@ -26,18 +27,25 @@ async def get_current_active_auth_user(
 
 async def get_user_by_phone_number(phone_number: str) -> User:
     async with get_db() as db:
-        query = select(UserORM).where(UserORM.phone_number == phone_number)
-        result = await db.execute(query)
-        user_db = result.scalars().first()
+        try:
+            query = select(UserORM).where(UserORM.phone_number == phone_number)
+            result = await db.execute(query)
+            user_db = result.scalars().first()
 
-        if not user_db:
+            if not user_db:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="User not found"
+                )
+
+            user = User.from_orm(user_db)
+            return user
+
+        except SQLAlchemyError as e:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="An unexpected error occurred while processing the request"
             )
-
-    user = User.from_orm(user_db)
-    return user
 
 
 async def check_seller_permissions(user: User = Depends(get_current_active_auth_user)):

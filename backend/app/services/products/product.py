@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -15,7 +14,6 @@ async def get_product_by_id(product_id: int) -> Product:
         try:
             query = select(ProductORM).where(ProductORM.id == product_id)
             result = await db.execute(query)
-
             product_db = result.scalars().one_or_none()
 
             if not product_db:
@@ -36,6 +34,12 @@ async def get_product_by_id(product_id: int) -> Product:
 
 
 async def add_item_to_cart(cart_item: CartItemRequest):
+    if cart_item.quantity <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Quantity must be greater than zero"
+        )
+
     async with get_db() as db:
         try:
             query = select(CartORM).where(
@@ -43,7 +47,6 @@ async def add_item_to_cart(cart_item: CartItemRequest):
                 CartORM.product_id == cart_item.product_id
             )
             result = await db.execute(query)
-
             cart_item_db = result.scalars().one_or_none()
 
             if cart_item_db:
