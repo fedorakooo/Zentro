@@ -10,14 +10,14 @@ class OrderBase(BaseModel):
     updated_at: datetime
     total_amount: condecimal(gt=0)  # Ensure total amount is greater than zero
     status: str
-    shipping_address: Optional[str] = None
+    distribution_center_id: int
     payment_method: Optional[str] = None
 
 
 # Properties to receive via API when updating order details, all are optional
 class OrderUpdate(BaseModel):
     status: Optional[str] = None
-    shipping_address: Optional[str] = None
+    distribution_center_id: int
     payment_method: Optional[str] = None
 
 
@@ -26,7 +26,7 @@ class OrderCreate(BaseModel):
     user_id: int
     total_amount: condecimal(gt=0)  # Ensure total amount is greater than zero
     status: str
-    shipping_address: Optional[str] = None
+    distribution_center_id: int
     payment_method: Optional[str] = None
 
 
