@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
+from typing import List
 
 from app.core.models.distribution import DistributionCenterORM
 from app.core.schemas.distribution import DistributionCenter
@@ -28,5 +29,22 @@ async def get_distribution_center_by_id(distribution_center_id: int) -> Distribu
         except SQLAlchemyError as e:
             raise HTTPException(
                 status_code=500,
-                detail="An unexpected error occurred while fetching the product",
+                detail="An unexpected error occurred while fetching the distribution center"
+            )
+
+
+async def get_all_distribution_centers() -> List[DistributionCenter]:
+    async with get_db() as db:
+        try:
+            query = select(DistributionCenterORM)
+            result = await db.execute(query)
+
+            distribution_centers_db = result.scalars().all()
+
+            return distribution_centers_db
+
+        except SQLAlchemyError as e:
+            raise HTTPException(
+                status_code=500,
+                detail="An unexpected error occurred while fetching the distribution centers"
             )
