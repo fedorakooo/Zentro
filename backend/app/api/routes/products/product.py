@@ -8,7 +8,7 @@ from app.services.products.product import get_product_by_id, add_item_to_cart, a
 from app.services.user.user import get_current_active_auth_user, check_seller_permissions
 from app.api.routes.products.reviews import router as reviews_router
 
-router = APIRouter(tags=["Product"], prefix="/products")
+router = APIRouter(tags=["Products"], prefix="/products")
 
 router.include_router(reviews_router)
 
@@ -34,6 +34,7 @@ async def add_product_to_cart(
     result = await add_item_to_cart(cart_item)
 
     return result
+
 
 @router.post("/create")
 async def create_product(product: ProductCreate, user: User = Depends(check_seller_permissions)):

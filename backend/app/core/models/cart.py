@@ -1,4 +1,6 @@
-from sqlalchemy import Integer, ForeignKey
+from sqlalchemy import (
+    Integer, ForeignKey
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base

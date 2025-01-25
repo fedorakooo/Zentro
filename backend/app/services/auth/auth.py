@@ -18,7 +18,7 @@ async def validate_auth_users(
 
     async with get_db() as db:
         # User login occurs using a phone number as username
-        query = select(UserORM).where(username == UserORM.phone_number)
+        query = select(UserORM).where(UserORM.phone_number == username)
         result = await db.execute(query)
         user = result.scalars().one_or_none()
 
