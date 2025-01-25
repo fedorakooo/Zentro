@@ -12,8 +12,9 @@ from app.core.db import DATABASE_URL, Base
 from app.core.models.users import UserORM, SavedCardORM
 from app.core.models.products import ProductORM, ProductSizeORM, CategoryORM
 from app.core.models.orders import OrderORM, OrderProductORM
-from app.core.models.reviews import ReviewORM
+from app.core.models.reviews import ProductReviewORM, DistributionReviewORM
 from app.core.models.cart import CartORM
+from app.core.models.distribution import DistributionCenterORM
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
