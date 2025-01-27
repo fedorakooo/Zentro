@@ -14,7 +14,7 @@ from app.services.auth.password_handler import hash_password
 async def register_user(db: AsyncSession, user: UserRegisterRequest):
     try:
         result = await db.execute(select(UserORM).filter(UserORM.email == user.email))
-        existing_user = result.scalars().first()
+        existing_user = result.scalars().one_or_none()
         if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -22,7 +22,7 @@ async def register_user(db: AsyncSession, user: UserRegisterRequest):
             )
 
         result = await db.execute(select(UserORM).filter(UserORM.phone_number == user.phone_number))
-        existing_user = result.scalars().first()
+        existing_user = result.scalars().one_or_none()
         if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -54,10 +54,12 @@ async def register_user(db: AsyncSession, user: UserRegisterRequest):
 
     except SQLAlchemyError as e:
         await db.rollback()
+        print(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected database error occurred during user registration."
         )
+
 
 
 def generate_referral_code(length=8):

@@ -2,6 +2,8 @@ from pydantic import BaseModel, EmailStr, condecimal
 from datetime import datetime
 from typing import Optional
 
+from app.core.emuns.user import UserRole
+
 
 # Shared properties for user, base class for common user attributes
 class UserBase(BaseModel):
@@ -9,7 +11,7 @@ class UserBase(BaseModel):
     name: str
     phone_number: str
     is_active: bool = True
-    is_seller: bool = False
+    role: UserRole
     balance: condecimal(max_digits=10, decimal_places=2) = 0.0
     created_at: datetime
     updated_at: datetime
@@ -26,7 +28,7 @@ class UserUpdate(BaseModel):
     name: Optional[str] = None
     phone_number: Optional[str] = None
     is_active: Optional[bool] = None
-    is_seller: Optional[bool] = None
+    role: Optional[UserRole] = None
     balance: Optional[condecimal(max_digits=10, decimal_places=2)] = None
     address: Optional[str] = None
     loyalty_points: Optional[condecimal(max_digits=10, decimal_places=2)] = None
@@ -48,13 +50,14 @@ class User(UserBase):
     class Config:
         from_attributes = True
 
+
 # Properties to receive via API when creating a user
 class UserRegisterRequest(BaseModel):
     email: Optional[EmailStr] = None
     phone_number: str
     name: str
     password: str
-    is_seller: Optional[bool] = None
+    role: UserRole
 
 
 class UserLoginRequest(BaseModel):

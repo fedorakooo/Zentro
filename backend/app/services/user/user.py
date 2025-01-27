@@ -3,6 +3,7 @@ from fastapi import HTTPException, status, Depends
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.core.emuns.user import UserRole
 from app.dependencies.db import get_db
 from app.core.schemas.users import User
 from app.core.models.users import UserORM
@@ -49,7 +50,7 @@ async def get_user_by_phone_number(phone_number: str) -> User:
 
 
 async def check_seller_permissions(user: User = Depends(get_current_active_auth_user)):
-    if not user.is_seller:
+    if user.role not in {UserRole.SELLER, UserRole.ADMIN}:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You must be a seller to perform this action"
