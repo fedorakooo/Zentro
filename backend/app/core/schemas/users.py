@@ -27,13 +27,8 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     name: Optional[str] = None
     phone_number: Optional[str] = None
-    is_active: Optional[bool] = None
-    role: Optional[UserRole] = None
-    balance: Optional[condecimal(max_digits=10, decimal_places=2)] = None
     address: Optional[str] = None
-    loyalty_points: Optional[condecimal(max_digits=10, decimal_places=2)] = None
     profile_picture_url: Optional[str] = None
-    referral_code: Optional[str] = None
     gender: Optional[str] = None
 
 
