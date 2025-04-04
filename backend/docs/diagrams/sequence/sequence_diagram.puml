@@ -1,0 +1,90 @@
+@startuml seq
+
+actor "Клиент" as Client 
+
+participant "Client Frontend" as ClientFrontend
+participant "Client Backend" as ClientBackend
+participant Database
+participant "Worker Backend" as WorkerBackend
+participant "Worker Frontend" as WorkerFrontend
+
+actor "Работник Пункта\nВыдачи Товара" as Worker
+
+
+Client -> ClientFrontend: Зарегистрироваться в системе
+ClientFrontend -> ClientFrontend: Проверка валидации данных
+ClientFrontend -> ClientBackend: POST /api/auth/register { UserCreateRequest }
+ClientBackend -> ClientBackend: Проверка валидации
+ClientBackend -> ClientBackend: Хеширование пароля
+ClientBackend -> Database: INSERT INTO users ( ... )
+Database --> ClientBackend: Объект нового пользователя
+ClientBackend -> ClientBackend: Преобразование данных
+ClientBackend --> ClientFrontend: 201 Created { UserResponse }
+ClientFrontend --> Client: Успешная регистрация
+
+Client -> ClientFrontend: Вход {phone_number, password}
+ClientFrontend -> ClientBackend: POST /api/auth/login {phone_number, password}
+ClientBackend -> Database: SELECT * FROM users WHERE phone_number=?
+Database --> ClientBackend: Данные пользователя
+ClientBackend -> ClientBackend: Проверка пароля
+ClientBackend -> ClientBackend: Генерация токенов
+ClientBackend --> ClientFrontend: 200 OK {accessToken, refreshToken}
+ClientFrontend --> Client: Сохранение токенов
+
+Client -> ClientFrontend: Нажимает "Оформить заказ"
+ClientFrontend -> ClientBackend: POST /api/orders { OrderCreateRequest }\nAuthorization: Bearer <token>
+ClientBackend -> ClientBackend: Проверка токена
+ClientBackend -> Database: INSERT INTO orders (...)
+Database --> ClientBackend: Данные заказа
+
+ClientBackend -> WorkerBackend: Уведомление о новом заказе { OrderMessage }
+WorkerBackend -> WorkerFrontend: 
+WorkerFrontend -> WorkerBackend: GET /api/orders/{orderId}
+WorkerBackend -> Database: SELECT * FROM orders WHERE id=?
+Database --> WorkerBackend: Данные заказа
+WorkerBackend --> WorkerFrontend: 200 OK { OrderResponse }
+Worker -> WorkerFrontend: Подтверждает заказ
+WorkerFrontend -> WorkerBackend: PATCH /api/orders/{orderId} {status: "ACCEPTED"}
+WorkerBackend -> Database: UPDATE orders SET status="ACCEPTED"
+Database --> WorkerBackend: Данные заказа
+WorkerBackend -> ClientBackend: Статус заказа обновлён
+ClientBackend -> Database: SELECT * FROM orders WHERE id=?
+Database --> ClientBackend: Данные заказа
+ClientBackend -> ClientFrontend: 200 OK { OrderResponse }
+ClientFrontend -> Client: Уведомление: "Заказ подтверждён"
+
+Client -> ClientFrontend: Приходит в пункт выдачи
+ClientFrontend -> ClientBackend: GET /api/orders/{orderId}
+ClientBackend -> Database: SELECT * FROM orders WHERE id=?
+Database --> ClientBackend: Данные заказа
+ClientBackend --> ClientFrontend: 200 OK {orderDetails}
+
+Client -> Worker: Предъявляет QR-код заказа (сканирует/показывает)
+Worker -> WorkerFrontend: Вводит/сканирует QR-код
+WorkerFrontend -> WorkerBackend: POST /api/orders/verify
+WorkerBackend -> Database: SELECT * orders from orders WHERE ?
+
+alt Код действителен
+    WorkerBackend -> Database: UPDATE orders SET status = "completed"\nWHERE id = ?
+    Database --> WorkerBackend: Статус заказа
+    WorkerBackend -> WorkerBackend: Преобразование данных
+    WorkerBackend --> WorkerFrontend: 200 OK {status: OrderResponse}
+    WorkerFrontend -> Worker: Получение информации о заказе
+else Код недействителен
+    WorkerBackend --> WorkerFrontend: 400 Bad Request {message "Bad request"}
+    WorkerFrontend -> Worker: Показывает ошибку: "Код не распознан"
+end
+
+
+Worker -> WorkerFrontend: Отмечает заказ как выданный
+WorkerFrontend -> WorkerBackend: PATCH /api/orders/{orderId} {status: "completed"}
+WorkerBackend -> Database: UPDATE orders SET status="completed"
+Database --> WorkerBackend: Данные заказа
+WorkerBackend -> WorkerBackend: Преобразование данных
+WorkerBackend -> WorkerFrontend: 200 OK { OrderResponse }
+ClientBackend -> Database: SELECT status FROM orders WHERE id=?
+Database --> ClientBackend: Cтатус заказа
+ClientBackend --> ClientFrontend: 200 OK {status: "completed"}
+ClientFrontend -> Client: Уведомление: "Заказ получен"
+
+@enduml
