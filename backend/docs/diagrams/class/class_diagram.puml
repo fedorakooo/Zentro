@@ -1,0 +1,500 @@
+@startuml classdiagram
+
+namespace Entities {
+    class Client {
+        id: int
+        name: string
+        surname: string
+        email: string
+        phoneNumber: string
+        address: Address
+        hashed_password: string
+        status: ClientStatus
+        updated_at: DateTime
+        created_at: DateTime
+    }
+
+    class Address {
+        id: int
+        country: string
+        city: string
+        street: string
+        home_number: string
+        apartment_number: string
+        postcode: string
+    }
+
+    class Product {
+        id: int
+        name: string
+        description: string
+        price: float
+        category: Category
+        brand: Brand
+        variants: Variant[]
+    }
+    
+    class Category {
+        id: int
+        name: string
+        parent_category: Category
+    }
+
+    class Brand {
+        id: int
+        name: string 
+        description: string
+    }
+
+    class Variant {
+        id: int
+        size: string
+        color: string
+        quantity: int
+        price: float
+    }
+
+    class Order {
+        id: int
+        client: Client
+        status: OrderStatus
+        total_price: float
+        items: OrderItem[]
+        created_at: DateTime
+    }
+
+    class OrderItem {
+        id: int
+        product: Product
+        amount: int
+        total_price: float
+    }
+    
+    class Review {
+        id: int
+        client: Client
+        product: Product
+        rating: int
+        comment: string
+        created_at: DateTime
+    }
+    
+    class Staff {
+        id: int
+        name: string
+        surname: string
+        email: string
+        phoneNumber: string
+        position: Position
+        created_at: DateTime
+        updated_at: DateTime
+    }
+
+    class Seller {
+        id: int
+        store_name: string
+        contact_info: string
+        rating: float
+        products: Product[]
+    }
+
+    namespace Enums {
+        enum ClientStatus {
+            ACTIVE
+            BLOCKED
+            PENDING
+        }
+
+        enum OrderStatus {
+            PENDING 
+            PROCESSING
+            SHIPPED
+            DELIVERED
+            CANCELLED
+            REFUNDED
+            FAILED
+        }
+   
+        enum PositionStatus {
+            ADMIN
+            SELLER
+            DELIVERY_WORKER
+            SUPPORT
+            OTHER
+        }
+    }
+
+    Client "1" *-- "1" Enums.ClientStatus : status
+    Order "1" *-- "1" Enums.OrderStatus : status
+    Staff "1" *-- "1" Enums.PositionStatus : position
+}
+
+namespace Repository {
+    namespace RepositoryInterfaces {
+        interface AbstractClientRepository {
+            +get_user_by_id(id)
+            +get_user_by_phone_number(phone_number)
+            +update_user_by_id(id, user_update)
+            +create_user(user_create)
+            +delete_user_by_id(id)
+        }
+        interface AbstractProductRepository {
+            +get_product_by_id(id)
+            +update_product_by_id(id, product_update)
+            +create_product(product_create)
+            +delete_product_by_id(id)
+        }
+        interface AbstractBrandRepository {
+            +get_brand_by_id(id)
+            +update_brand_by_id(id, brand_update)
+            +create_brand(brand_create)
+            +delete_brand_by_id(id)
+        }
+        interface AbstractReviewRepository {
+            +get_reviews_by_product_id(product_id)
+            +get_reviews_by_user_id(user_id)
+            +create_review(review_create)
+        }
+        interface AbstractOrderRepository {
+            +get_order_by_id(id)
+            +get_orders_by_user_id(user_id)
+            +get_orders_by_delivery_point_id(delivery_point_id)
+            +update_order_status_by_id(id, new_order_status)
+        }
+        interface AbstractCartRepository {
+            +get_cart_by_user_id(user_id)
+            +add_products_to_user_cart(user_id, product, amount)
+            +delete_product_from_user_cart(user_id, product, amount)
+            +clear_user_product_cart(user_id)
+        }
+        interface AbstractSellerRepository {
+            +get_seller_by_id(id)
+            +get_seller_phone_number(phone_number)
+            +update_seller_by_id(id, user_update)
+            +create_seller(user_create)
+            +delete_seller_by_id(id)
+        }
+    }
+
+    namespace PostgreRepository {
+        class ClientPostgreRepository <<PostgreSQL, SQLAlchemy>> {
+            -session: AsyncSession
+            +get_user_by_id(id)
+            +get_user_by_phone_number(phone_number)
+            +update_user_by_id(id, user_update)
+            +create_user(user_create)
+            +delete_user_by_id(id)
+        }
+
+        class OrderPostgreRepository <<PostgreSQL, SQLAlchemy>> {
+            -session: AsyncSession
+            +get_order_by_id(id)
+            +get_orders_by_user_id(user_id)
+            +update_order_status_by_id(id, new_order_status)
+        }
+
+        class SellerPostgreRepository <<PostgreSQL, SQLAlchemy>> {
+            -session: AsyncSession
+            +get_seller_by_id(id)
+            +get_seller_phone_number(phone_number)
+            +update_seller_by_id(id, user_update)
+            +create_seller(user_create)
+            +delete_seller_by_id(id)
+        }
+
+        class CartPostgreRepository <<PostgreSQL, SQLAlchemy>> {
+            -session: AsyncSession
+            +get_cart_by_user_id(user_id)
+            +add_products_to_user_cart(user_id, product, amount)
+            +delete_product_from_user_cart(user_id, product, amount)
+            +clear_user_product_cart(user_id)
+        }
+    }
+
+    namespace MongoRepository {
+        class ProductMongoRepository <<MongoDB>> {
+            -collection: AsyncIOMotorCollection
+            +get_product_by_id(id)
+            +update_product_by_id(id, product_update)
+            +create_product(product_create)
+            +delete_product_by_id(id)
+        }
+
+        class BrandMongoRepository <<MongoDB>> {
+            -collection: AsyncIOMotorCollection
+            +get_brand_by_id(id)
+            +update_brand_by_id(id, brand_update)
+            +create_brand(brand_create)
+            +delete_brand_by_id(id)
+        }
+
+        class ReviewMongoRepository <<MongoDB>> {
+            -collection: AsyncIOMotorCollection
+            -search_client: SearchClient
+            +get_reviews_by_product_id(product_id)
+            +get_reviews_by_user_id(user_id)
+            +create_review(review_create)
+        }
+    }
+
+    namespace RedisRepository {
+        class ClientRedisRepository <<Redis>> {
+            -redis_client: Redis
+            +cache_user_data(user_id, user_data)
+            +get_cached_user_data(user_id)
+            +invalidate_user_cache(user_id)
+        }
+    }
+    
+    namespace ElasticSearchRepository {
+        class ProductSearchRepository <<Elasticsearch, elasticsearch-py>> {
+            -es_client: Elasticsearch
+            -index_name: str
+            +search_products(query, filters)
+            +index_product(product_data)
+            +update_product_index(product_id, update_data)
+            +delete_product_from_index(product_id)
+        }
+    }
+}
+
+namespace Models {
+    namespace Products {
+        class ValiantRequest {
+            id: int
+            size: string
+            color: string
+            quantity: int
+            price: float
+        }
+
+        class ProductResponse {
+            id: int
+            name: string
+            description: string
+            price: float
+            category: Category
+            brand: Brand
+            valiants: ValiantRequest[]
+        }
+
+        class ProductCreateRequest {
+            name: string
+            description: string
+            price: float
+            category: Category
+            brand: Brand
+            valiants: ValiantRequest[]
+        }
+
+        class OrderItemResponse {
+            id: int
+            product: Product
+            amount: int
+            total_price: float
+        }
+
+        class OrderResponse {
+            id: int
+            client: Client
+            status: OrderStatus
+            total_price: float
+            items: OrderItem[]
+            created_at: DateTime
+        }
+    }
+}
+
+namespace Mappers {
+    class Mapper {
+
+    }
+}
+
+namespace Services {
+    namespace ServiceInterfaces {
+        interface IClientService {
+            +get_client(id: int): Client
+            +get_client_by_phone(phone: string): Client
+            +create_client(client_data: dict): Client
+            +update_client(id: int, update_data: dict): Client
+            +delete_client(id: int): bool
+            +change_client_status(id: int, status: ClientStatus): Client
+        }
+        
+        interface IProductService {
+            +get_product(id: int): Product
+            +search_products(query: str, filters: dict): List[Product]
+            +create_product(product_data: dict): Product
+            +update_product(id: int, update_data: dict): Product
+            +delete_product(id: int): bool
+            +get_products_by_brand(brand_id: int): List[Product]
+        }
+        
+        interface IOrderService {
+            +get_order(id: int): Order
+            +get_client_orders(client_id: int): List[Order]
+            +create_order(order_data: dict): Order
+            +update_order_status(id: int, status: OrderStatus): Order
+            +cancel_order(id: int): Order
+        }
+        
+        interface ICartService {
+            +get_cart(client_id: int): dict
+            +add_to_cart(client_id: int, product_id: int, quantity: int): dict
+            +remove_from_cart(client_id: int, product_id: int, quantity: int): dict
+            +clear_cart(client_id: int): bool
+        }
+        
+        interface IReviewService {
+            +get_product_reviews(product_id: int): List[Review]
+            +get_client_reviews(client_id: int): List[Review]
+            +create_review(review_data: dict): Review
+            +delete_review(review_id: int): bool
+        }
+        
+        interface ISellerService {
+            +get_seller(id: int): Seller
+            +create_seller(seller_data: dict): Seller
+            +update_seller(id: int, update_data: dict): Seller
+            +delete_seller(id: int): bool
+            +get_seller_products(seller_id: int): List[Product]
+        }
+    }
+
+    namespace ServiceImplementations {
+        class ClientService <<(S,#FF7700)>> {
+            -client_repo: AbstractClientRepository
+            -cache_repo: ClientRedisRepository
+            +get_client(id: int): Client
+            +get_client_by_phone(phone: string): Client
+            +create_client(client_data: dict): Client
+            +update_client(id: int, update_data: dict): Client
+            +delete_client(id: int): bool
+            +change_client_status(id: int, status: ClientStatus): Client
+        }
+        
+        class ProductService <<(S,#FF7700)>> {
+            -product_repo: AbstractProductRepository
+            -brand_repo: AbstractBrandRepository
+            -search_repo: ProductSearchRepository
+            +get_product(id: int): Product
+            +search_products(query: str, filters: dict): List[Product]
+            +create_product(product_data: dict): Product
+            +update_product(id: int, update_data: dict): Product
+            +delete_product(id: int): bool
+            +get_products_by_brand(brand_id: int): List[Product]
+        }
+        
+        class OrderService <<(S,#FF7700)>> {
+            -order_repo: AbstractOrderRepository
+            -product_repo: AbstractProductRepository
+            +get_order(id: int): Order
+            +get_client_orders(client_id: int): List[Order]
+            +create_order(order_data: dict): Order
+            +update_order_status(id: int, status: OrderStatus): Order
+            +cancel_order(id: int): Order
+        }
+        
+        class CartService <<(S,#FF7700)>> {
+            -cart_repo: AbstractCartRepository
+            -product_repo: AbstractProductRepository
+            +get_cart(client_id: int): dict
+            +add_to_cart(client_id: int, product_id: int, quantity: int): dict
+            +remove_from_cart(client_id: int, product_id: int, quantity: int): dict
+            +clear_cart(client_id: int): bool
+        }
+        
+        class ReviewService <<(S,#FF7700)>> {
+            -review_repo: AbstractReviewRepository
+            +get_product_reviews(product_id: int): List[Review]
+            +get_client_reviews(client_id: int): List[Review]
+            +create_review(review_data: dict): Review
+            +delete_review(review_id: int): bool
+        }
+        
+        class SellerService <<(S,#FF7700)>> {
+            -seller_repo: AbstractSellerRepository
+            -product_repo: AbstractProductRepository
+            +get_seller(id: int): Seller
+            +create_seller(seller_data: dict): Seller
+            +update_seller(id: int, update_data: dict): Seller
+            +delete_seller(id: int): bool
+            +get_seller_products(seller_id: int): List[Product]
+        }
+    }
+}
+
+namespace Orchestrator {
+    class OrderOrchestrator {
+        -order_service: IOrderService
+        -product_service: IProductService
+        -cart_service: ICartService
+        -client_service: IClientService
+        +place_order(client_id: int): Order
+        +process_order(order_id: int): Order
+        +cancel_order(order_id: int): Order
+        +get_order_details(order_id: int): OrderResponse
+    }
+    
+    class ProductOrchestrator {
+        -product_service: IProductService
+        -review_service: IReviewService
+        -seller_service: ISellerService
+        +get_product_details(product_id: int): ProductDetailsResponse
+        +create_product_with_review(product_data: dict, review_data: dict): Product
+        +get_seller_products_with_reviews(seller_id: int): List[ProductWithReviews]
+    }
+    
+    class ClientOrchestrator {
+        -client_service: IClientService
+        -order_service: IOrderService
+        -review_service: IReviewService
+        +get_client_profile(client_id: int): ClientProfile
+        +get_client_activity(client_id: int): ClientActivity
+        +deactivate_client(client_id: int): Client
+    }
+}
+
+AbstractClientRepository <|.. ClientPostgreRepository
+AbstractProductRepository <|.. ProductMongoRepository
+AbstractBrandRepository <|.. BrandMongoRepository
+AbstractReviewRepository <|.. ReviewMongoRepository
+AbstractOrderRepository <|.. OrderPostgreRepository
+AbstractCartRepository <|.. CartPostgreRepository
+AbstractSellerRepository <|.. SellerPostgreRepository
+ClientPostgreRepository --> ClientRedisRepository
+ProductMongoRepository --> ProductSearchRepository
+
+IClientService <|.. ClientService
+IProductService <|.. ProductService
+IOrderService <|.. OrderService
+ICartService <|.. CartService
+IReviewService <|.. ReviewService
+ISellerService <|.. SellerService
+
+ClientService --> AbstractClientRepository
+ClientService --> ClientRedisRepository
+ProductService --> AbstractProductRepository
+ProductService --> AbstractBrandRepository
+ProductService --> ProductSearchRepository
+OrderService --> AbstractOrderRepository
+OrderService --> AbstractProductRepository
+CartService --> AbstractCartRepository
+CartService --> AbstractProductRepository
+ReviewService --> AbstractReviewRepository
+SellerService --> AbstractSellerRepository
+SellerService --> AbstractProductRepository
+
+OrderOrchestrator --> IOrderService
+OrderOrchestrator --> IProductService
+OrderOrchestrator --> ICartService
+OrderOrchestrator --> IClientService
+ProductOrchestrator --> IProductService
+ProductOrchestrator --> IReviewService
+ProductOrchestrator --> ISellerService
+ClientOrchestrator --> IClientService
+ClientOrchestrator --> IOrderService
+ClientOrchestrator --> IReviewService
+
+@enduml
