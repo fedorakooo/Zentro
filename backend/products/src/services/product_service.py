@@ -1,6 +1,3 @@
-from beanie import PydanticObjectId
-from typing import Optional, List
-
 from src.models.product import Product
 from src.repositories.product_mongo_repository import AbstractProductMongoRepository
 from src.schemas.products import ProductRead, ProductCreate, ProductUpdate
@@ -11,13 +8,13 @@ class ProductService(AbstractProductService):
     def __init__(self, product_repository: AbstractProductMongoRepository):
         self.repository = product_repository
 
-    async def get_product(self, product_id: PydanticObjectId) -> Optional[ProductRead]:
+    async def get_product(self, product_id: str) -> ProductRead | None:
         product = await self.repository.get_by_id(product_id)
         if product is None:
             return None
         return ProductRead.from_orm(product)
 
-    async def get_products(self, product_ids: List[PydanticObjectId]) -> List[ProductRead]:
+    async def get_products(self, product_ids: list[str]) -> list[ProductRead]:
         products = await self.repository.get_by_ids(product_ids)
         return [ProductRead.from_orm(product) for product in products]
 
@@ -28,10 +25,10 @@ class ProductService(AbstractProductService):
 
     async def update_product(
             self,
-            product_id: PydanticObjectId,
+            product_id: str,
             product_update: ProductUpdate,
             partial: bool = True
-    ) -> Optional[ProductRead]:
+    ) -> list[ProductRead]:
         update_data = product_update.dict()
 
         if not partial:
@@ -45,20 +42,20 @@ class ProductService(AbstractProductService):
             return None
         return ProductRead.from_orm(updated_product)
 
-    async def delete_product(self, product_id: PydanticObjectId) -> bool:
+    async def delete_product(self, product_id: str) -> bool:
         return await self.repository.delete(product_id)
 
     async def search_products(
             self,
-            name: Optional[str] = None,
-            brand: Optional[str] = None,
-            brand_id: Optional[int] = None,
-            category_id: Optional[int] = None,
-            min_price: Optional[float] = None,
-            max_price: Optional[float] = None,
+            name: str | None = None,
+            brand: str | None = None,
+            brand_id: int | None = None,
+            category_id: int | None = None,
+            min_price: float | None = None,
+            max_price: float | None = None,
             skip: int = 0,
             limit: int = 100
-    ) -> List[ProductRead]:
+    ) -> list[ProductRead]:
         products = await self.repository.search(
             name=name,
             brand=brand,
@@ -73,12 +70,12 @@ class ProductService(AbstractProductService):
 
     async def count_products(
             self,
-            name: Optional[str] = None,
-            brand: Optional[str] = None,
-            brand_id: Optional[int] = None,
-            category_id: Optional[int] = None,
-            min_price: Optional[float] = None,
-            max_price: Optional[float] = None
+            name: str | None = None,
+            brand: str | None = None,
+            brand_id: int | None = None,
+            category_id: int | None = None,
+            min_price: float | None = None,
+            max_price: float | None = None
     ) -> int:
         return await self.repository.count(
             name=name,

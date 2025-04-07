@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, field_serializer, validator
 from beanie import PydanticObjectId
 
 
@@ -39,18 +39,19 @@ class ProductUpdate(ProductBase):
 
 
 class ProductRead(ProductBase):
-    id: PydanticObjectId = Field(..., alias="_id")
+    id: str
     price: float | None = None
     quantity: int | None = None
     variants: list[ProductVariantSchema] | None = None
     photos: list[str] | None = None
-    updated_at: datetime | None = None
-    created_at: datetime | None = None
+    updated_at: datetime
+    created_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-        populate_by_name=True,
-        json_encoders={
-            PydanticObjectId: str
-        }
-    )
+    @validator('id', pre=True)
+    def convert_id_to_str(cls, value):
+        if isinstance(value, PydanticObjectId):
+            return str(value)
+        return value
+
+    class Config:
+        from_attributes = True

@@ -36,4 +36,4 @@ class Product(Document):
             ProductVariantSchema: lambda v: v.dict()
         }
         from_attributes = True
-        allow_population_by_field_name = True
+        validate_by_name = True

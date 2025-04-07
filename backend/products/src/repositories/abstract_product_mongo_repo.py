@@ -1,16 +1,15 @@
 from abc import abstractmethod, ABC
 
-from beanie import PydanticObjectId
 from src.models.product import Product
 
 
 class AbstractProductMongoRepository(ABC):
     @abstractmethod
-    async def get_by_id(self, product_id: PydanticObjectId) -> Product | None:
+    async def get_by_id(self, product_id: str) -> Product | None:
         pass
 
     @abstractmethod
-    async def get_by_ids(self, product_ids: list[PydanticObjectId]) -> list[Product]:
+    async def get_by_ids(self, product_ids: list[str]) -> list[Product]:
         pass
 
     @abstractmethod
@@ -18,11 +17,11 @@ class AbstractProductMongoRepository(ABC):
         pass
 
     @abstractmethod
-    async def update(self, product_id: PydanticObjectId, update_data: dict) -> Product | None:
+    async def update(self, product_id: str, update_data: dict) -> Product | None:
         pass
 
     @abstractmethod
-    async def delete(self, product_id: PydanticObjectId) -> bool:
+    async def delete(self, product_id: str) -> bool:
         pass
 
     @abstractmethod

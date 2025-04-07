@@ -1,20 +1,24 @@
 from beanie import PydanticObjectId
+
 from src.models.product import Product
 from src.repositories.abstract_product_mongo_repo import AbstractProductMongoRepository
 
 
 class ProductMongoRepository(AbstractProductMongoRepository):
-    async def get_by_id(self, product_id: PydanticObjectId) -> Product | None:
+    async def get_by_id(self, product_id: str) -> Product | None:
+        product_id = PydanticObjectId(product_id)
         return await Product.find_one({"_id": product_id})
 
-    async def get_by_ids(self, product_ids: list[PydanticObjectId]) -> list[Product]:
+    async def get_by_ids(self, product_ids: list[str]) -> list[Product]:
+        product_ids = [PydanticObjectId(pid) for pid in product_ids]
         return await Product.find({"_id": {"$in": product_ids}}).to_list()
 
     async def create(self, product: Product) -> Product:
         await product.create()
         return product
 
-    async def update(self, product_id: PydanticObjectId, update_data: dict) -> Product | None:
+    async def update(self, product_id: str, update_data: dict) -> Product | None:
+        product_id = PydanticObjectId(product_id)
         product = await self.get_by_id(product_id)
         if product is None:
             return None
@@ -22,11 +26,11 @@ class ProductMongoRepository(AbstractProductMongoRepository):
         await product.update({"$set": update_data})
         return await self.get_by_id(product_id)
 
-    async def delete(self, product_id: PydanticObjectId) -> bool:
+    async def delete(self, product_id: str) -> bool:
         product = await self.get_by_id(product_id)
         if product is None:
             return False
-        await product.delete({})
+        await product.delete()
         return True
 
     async def search(

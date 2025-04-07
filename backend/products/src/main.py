@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from src.containers import Container
 from src.api.v1.routers import router
 
