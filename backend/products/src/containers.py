@@ -4,7 +4,7 @@ from beanie import init_beanie
 
 from src.models.product import Product
 from src.repositories.mongo.product_repository import ProductMongoRepository
-from src.services.product_service import ProductService
+from src.application.services.product_service import ProductService
 
 
 class Container(containers.DeclarativeContainer):

@@ -3,7 +3,7 @@ from dependency_injector.wiring import inject, Provide
 
 from src.containers import Container
 from src.schemas.products import ProductRead, ProductCreate, ProductUpdate
-from src.services.abstract_product_service import AbstractProductService
+from src.application.abstractions.abstract_product_service import AbstractProductService
 
 router = APIRouter(prefix="/products", tags=["Products"])
 

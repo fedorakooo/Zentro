@@ -1,7 +1,7 @@
 from src.models.product import Product
 from src.repositories.mongo.product_repository import AbstractProductMongoRepository
 from src.schemas.products import ProductRead, ProductCreate, ProductUpdate
-from src.services.abstract_product_service import AbstractProductService
+from src.application.abstractions.abstract_product_service import AbstractProductService
 
 
 class ProductService(AbstractProductService):
