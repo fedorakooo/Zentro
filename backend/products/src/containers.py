@@ -3,7 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
 
 from src.models.product import Product
-from src.repositories.product_mongo_repository import ProductMongoRepository
+from src.repositories.mongo.product_repository import ProductMongoRepository
 from src.services.product_service import ProductService
 
 
