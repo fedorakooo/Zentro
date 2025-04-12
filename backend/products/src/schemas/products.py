@@ -2,6 +2,8 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, field_serializer, validator
 from beanie import PydanticObjectId
 
+from src.enums.product import ProductStatus
+
 
 class ProductVariantSchema(BaseModel):
     criterion: str
@@ -44,8 +46,11 @@ class ProductRead(ProductBase):
     quantity: int | None = None
     variants: list[ProductVariantSchema] | None = None
     photos: list[str] | None = None
+    status: ProductStatus
     updated_at: datetime
     created_at: datetime
+    average_rating: float
+    review_count: int
 
     @validator('id', pre=True)
     def convert_id_to_str(cls, value):

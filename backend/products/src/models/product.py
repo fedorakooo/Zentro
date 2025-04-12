@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from beanie import Document, PydanticObjectId
 from pydantic import Field
 
+from src.enums.product import ProductStatus
 from src.schemas.products import ProductVariantSchema
 
 
@@ -11,9 +12,12 @@ class Product(Document):
     brand: str
     brand_id: int
     supplier_id: int
+    average_rating: float = 0
+    review_count: int = 0
     price: float | None = None
     quantity: int | None = None
     category_id: int
+    status: ProductStatus
     variants: list[ProductVariantSchema] | None = None
     photos: list[str] | None = None
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
