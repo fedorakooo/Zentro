@@ -1,6 +1,7 @@
 from beanie import PydanticObjectId
 from bson.errors import InvalidId
 
+from src.enums.product import ProductStatus
 from src.exceptions.product_exceptions import HttpInvalidProductIdError, HttpProductNotFoundError
 from src.models.product import Product
 from src.infrastructure.repositories.abstractions.abstract_product_repository import AbstractProductMongoRepository
@@ -38,8 +39,8 @@ class ProductMongoRepository(AbstractProductMongoRepository):
     async def delete(self, product_id: str) -> None:
         product = await self.get_by_id(product_id)
         if product is None:
-            return HttpProductNotFoundError(product_id)
-        await product.delete()
+            raise HttpProductNotFoundError(product_id)
+        await product.update({"$set": {"status": ProductStatus.REMOVED}})
         return True
 
     async def search(
@@ -72,3 +73,10 @@ class ProductMongoRepository(AbstractProductMongoRepository):
             query["price"] = price_query
 
         return await Product.find(query).skip(skip).limit(limit).to_list()
+
+    async def change_status(self, product_id: str, new_status: ProductStatus) -> Product | None:
+        product = await self.get_by_id(product_id)
+        if not product:
+            raise HttpProductNotFoundError(product_id)
+        await product.update({"$set": {"status": new_status}})
+        return await self.get_by_id(product_id)

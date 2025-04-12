@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
 
+from src.enums.product import ProductStatus
 from src.schemas.products import ProductRead, ProductCreate, ProductUpdate
 
 
@@ -20,13 +21,12 @@ class AbstractProductService(ABC):
     async def update_product(
             self,
             product_id: str,
-            product_update: ProductUpdate,
-            partial: bool = True
+            product_update: ProductUpdate
     ) -> ProductRead | None:
         pass
 
     @abstractmethod
-    async def delete_product(self, product_id: str) -> bool:
+    async def delete_product(self, product_id: str) -> None:
         pass
 
     @abstractmethod
@@ -44,13 +44,5 @@ class AbstractProductService(ABC):
         pass
 
     @abstractmethod
-    async def count_products(
-            self,
-            name: str | None = None,
-            brand: str | None = None,
-            brand_id: int | None = None,
-            category_id: int | None = None,
-            min_price: float | None = None,
-            max_price: float | None = None
-    ) -> int:
+    async def compensate_delete_product(self, product_id: int, original_status: ProductStatus) -> None:
         pass

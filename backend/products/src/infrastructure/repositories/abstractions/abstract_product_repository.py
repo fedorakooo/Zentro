@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABC
 
+from src.enums.product import ProductStatus
 from src.models.product import Product
 
 
@@ -36,4 +37,8 @@ class AbstractProductMongoRepository(ABC):
             skip: int = 0,
             limit: int = 100
     ) -> list[Product]:
+        pass
+
+    @abstractmethod
+    async def change_status(self, product_id: str, new_status: ProductStatus) -> Product | None:
         pass
