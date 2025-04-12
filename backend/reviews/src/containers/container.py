@@ -3,7 +3,7 @@ from dependency_injector import containers, providers
 from src.application.services.review_service import ReviewService
 from src.config import settings
 from src.containers.database import DatabaseContainer
-from src.repositories.postgre.review_postgre_repository import ReviewPostgreRepository
+from src.infrastructure.repositories.implementations.postgre_review_repository import ReviewPostgreRepository
 
 
 class Container(containers.DeclarativeContainer):

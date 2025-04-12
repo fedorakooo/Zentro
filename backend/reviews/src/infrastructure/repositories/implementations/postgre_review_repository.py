@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from src.models.review import ReviewORM
-from src.repositories.abstractions.abstract_review_repository import AbstractReviewRepository
+from src.infrastructure.repositories.abstractions.abstract_review_repository import AbstractReviewRepository
 
 
 class ReviewPostgreRepository(AbstractReviewRepository):
