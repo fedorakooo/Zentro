@@ -1,7 +1,7 @@
 from beanie import PydanticObjectId
 
 from src.models.product import Product
-from src.repositories.abstractions.abstract_product_mongo_repo import AbstractProductMongoRepository
+from src.infrastructure.repositories.abstractions.abstract_product_repository import AbstractProductMongoRepository
 
 
 class ProductMongoRepository(AbstractProductMongoRepository):
