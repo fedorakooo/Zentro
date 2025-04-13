@@ -17,9 +17,14 @@ class DatabaseSettings:
     echo: bool = False
 
 
+class KafkaSettings:
+    boostrap_servers: str = "localhost:29092"
+    topic_review_event: str = "review_event"
+
+
 class Setting:
     db: DatabaseSettings = DatabaseSettings()
+    kafka: KafkaSettings = KafkaSettings()
 
 
 settings = Setting()
-print(settings.db.url)

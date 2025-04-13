@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import FastAPI
 from dependency_injector.wiring import inject
 
@@ -19,3 +21,11 @@ async def startup():
     engine = container.db.engine()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    consumer = container.consumer()
+    await consumer.start()
+    asyncio.create_task(consumer.consume_events())
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    await container.messaging.product_consumer().stop()
