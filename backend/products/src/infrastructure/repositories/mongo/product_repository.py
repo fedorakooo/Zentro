@@ -40,10 +40,10 @@ class ProductMongoRepository(AbstractProductMongoRepository):
         product = await self.get_by_id(product_id)
         if product is None:
             raise HttpProductNotFoundError(product_id)
-        await product.update({"$set": {"status": ProductStatus.REMOVED}})
+        await product.update({"$set": {"status": ProductStatus.DELETED}})
         return True
 
-    async def search(
+    async def get_products(
             self,
             name: str | None = None,
             brand: str | None = None,
