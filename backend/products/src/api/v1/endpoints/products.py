@@ -25,17 +25,31 @@ async def get_product(
     return product
 
 
-@router.get("", response_model=list[ProductRead])
+@router.get("/", response_model=list[ProductRead])
 @inject
-async def list_products(
+async def get_products(
+        name: str | None = None,
+        brand: str | None = None,
+        brand_id: int | None = None,
+        category_id: int | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
         skip: int = 0,
         limit: int = 100,
         service: AbstractProductService = Depends(Provide[Container.product_service])
 ) -> list[ProductRead]:
-    return await service.search_products(skip=skip, limit=limit)
+    return await service.get_products(
+        name=name,
+        brand=brand,
+        brand_id=brand_id,
+        category_id=category_id,
+        min_price=min_price,
+        max_price=max_price,
+        skip=skip,
+        limit=limit
+    )
 
-
-@router.post("", response_model=ProductRead, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ProductRead, status_code=status.HTTP_201_CREATED)
 @inject
 async def create_product(
         product_data: ProductCreate,
@@ -87,32 +101,7 @@ async def delete_product(
         )
 
 
-@router.get("/search", response_model=list[ProductRead])
-@inject
-async def search_products(
-        name: str | None = None,
-        brand: str | None = None,
-        brand_id: int | None = None,
-        category_id: int | None = None,
-        min_price: float | None = None,
-        max_price: float | None = None,
-        skip: int = 0,
-        limit: int = 100,
-        service: AbstractProductService = Depends(Provide[Container.product_service])
-) -> ProductRead:
-    return await service.search_products(
-        name=name,
-        brand=brand,
-        brand_id=brand_id,
-        category_id=category_id,
-        min_price=min_price,
-        max_price=max_price,
-        skip=skip,
-        limit=limit
-    )
-
-
-@router.post("/compensate/delete", status_code=status.HTTP_200_OK)
+@router.post("/{product_id}/compensate", status_code=status.HTTP_200_OK)
 @inject
 async def compensate_delete_product(
         product_id: str,

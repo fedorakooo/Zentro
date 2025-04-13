@@ -23,8 +23,27 @@ class ProductService(AbstractProductService):
             return None
         return ProductRead.from_orm(product)
 
-    async def get_products(self, product_ids: list[str]) -> list[ProductRead]:
-        products = await self.repository.get_by_ids(product_ids)
+    async def get_products(
+            self,
+            name: str | None = None,
+            brand: str | None = None,
+            brand_id: int | None = None,
+            category_id: int | None = None,
+            min_price: float | None = None,
+            max_price: float | None = None,
+            skip: int = 0,
+            limit: int = 100
+    ) -> list[ProductRead]:
+        products = await self.repository.get_products(
+            name=name,
+            brand=brand,
+            brand_id=brand_id,
+            category_id=category_id,
+            min_price=min_price,
+            max_price=max_price,
+            skip=skip,
+            limit=limit
+        )
         return [ProductRead.from_orm(product) for product in products]
 
     async def create_product(self, product_data: ProductCreate) -> ProductRead:
@@ -72,28 +91,21 @@ class ProductService(AbstractProductService):
             }
         )
 
-    async def search_products(
-            self,
-            name: str | None = None,
-            brand: str | None = None,
-            brand_id: int | None = None,
-            category_id: int | None = None,
-            min_price: float | None = None,
-            max_price: float | None = None,
-            skip: int = 0,
-            limit: int = 100
-    ) -> list[ProductRead]:
-        products = await self.repository.search(
-            name=name,
-            brand=brand,
-            brand_id=brand_id,
-            category_id=category_id,
-            min_price=min_price,
-            max_price=max_price,
-            skip=skip,
-            limit=limit
-        )
-        return [ProductRead.from_orm(product) for product in products]
-
     async def compensate_delete_product(self, product_id: str, original_status: ProductStatus) -> None:
+        await self.product_producer.start()
+
+        await self.product_producer.send_compensation_event(
+            product_id=product_id
+        )
+
+        await self.product_producer.stop()
+
         await self.repository.change_status(product_id, original_status)
+
+        return SagaResponse(
+            success=True,
+            message="Product compensate started",
+            compensation_data={
+                "product_id": product_id
+            }
+        )

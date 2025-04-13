@@ -10,7 +10,17 @@ class AbstractProductService(ABC):
         pass
 
     @abstractmethod
-    async def get_products(self, product_ids: list[str]) -> list[ProductRead]:
+    async def get_products(
+            self,
+            name: str | None = None,
+            brand: str | None = None,
+            brand_id: int | None = None,
+            category_id: int | None = None,
+            min_price: float | None = None,
+            max_price: float | None = None,
+            skip: int = 0,
+            limit: int = 100
+    ) -> list[ProductRead]:
         pass
 
     @abstractmethod
@@ -27,20 +37,6 @@ class AbstractProductService(ABC):
 
     @abstractmethod
     async def delete_product(self, product_id: str) -> None:
-        pass
-
-    @abstractmethod
-    async def search_products(
-            self,
-            name: str | None = None,
-            brand: str | None = None,
-            brand_id: int | None = None,
-            category_id: int | None = None,
-            min_price: float | None = None,
-            max_price: float | None = None,
-            skip: int = 0,
-            limit: int = 100
-    ) -> list[ProductRead]:
         pass
 
     @abstractmethod

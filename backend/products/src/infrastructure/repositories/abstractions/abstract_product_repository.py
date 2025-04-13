@@ -26,7 +26,7 @@ class AbstractProductMongoRepository(ABC):
         pass
 
     @abstractmethod
-    async def search(
+    async def get_products(
             self,
             name: str | None = None,
             brand: str | None = None,

@@ -28,12 +28,11 @@ class ProductProducer:
         )
         await self.producer.send("product_events", value=event.dict())
 
-    async def send_compensation_event(self, product_id: str, original_status: str):
+    async def send_compensation_event(self, product_id: str):
         event = ProductEvent(
             event_id=str(uuid.uuid4()),
             type=ProductEventType.DELETE_COMPENSATE,
             product_id=product_id,
-            original_status=original_status,
             timestamp=int(time.time())
         )
         await self.producer.send("product_events", value=event.dict())
