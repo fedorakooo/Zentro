@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 
-from src.enums.product import ProductStatus
+from src.core.enums.product import ProductStatus
 from src.schemas.products import ProductRead, ProductCreate, ProductUpdate
 
 

@@ -19,9 +19,12 @@ async def startup():
     await container.database.beanie_init()
     consumer = container.product_consumer()
     await consumer.start()
+    await container.elastic_search_client().connect()
     asyncio.create_task(consumer.consume_events())
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
     await container.messaging.product_consumer().stop()
+    await container.elastic_search_client().close()
+

@@ -1,10 +1,10 @@
 from beanie import PydanticObjectId
 from bson.errors import InvalidId
 
-from src.enums.product import ProductStatus
-from src.exceptions.product_exceptions import HttpInvalidProductIdError, HttpProductNotFoundError
+from src.core.enums.product import ProductStatus
+from src.core.exceptions.product_exceptions import HttpInvalidProductIdError, HttpProductNotFoundError
 from src.models.product import Product
-from src.infrastructure.repositories.abstractions.abstract_product_repository import AbstractProductMongoRepository
+from src.core.abstractions.abstract_product_repository import AbstractProductMongoRepository
 
 
 class ProductMongoRepository(AbstractProductMongoRepository):
@@ -17,7 +17,7 @@ class ProductMongoRepository(AbstractProductMongoRepository):
 
     async def get_by_ids(self, product_ids: list[str]) -> list[Product]:
         try:
-            product_ids = [PydanticObjectId(pid) for pid in product_ids]
+            product_ids = [PydanticObjectId(product_id) for product_id in product_ids]
         except InvalidId as exc:
             invalid_id = str(exc).split("'")[1]
             raise HttpInvalidProductIdError(invalid_id)

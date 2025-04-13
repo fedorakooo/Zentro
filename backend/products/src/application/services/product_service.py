@@ -1,8 +1,9 @@
-from src.enums.product import ProductStatus
-from src.exceptions.product_exceptions import HttpProductNotFoundError
+from src.core.enums.product import ProductStatus
+from src.core.exceptions.product_exceptions import HttpProductNotFoundError
+from src.infrastructure.elasticsearch.products.service import ElasticProductService
 from src.infrastructure.kafka.producers.product_producer import ProductProducer
 from src.models.product import Product
-from src.infrastructure.repositories.mongo.product_repository import AbstractProductMongoRepository
+from src.infrastructure.mongo.product_repository import AbstractProductMongoRepository
 from src.schemas.products import ProductRead, ProductCreate, ProductUpdate
 from src.application.abstractions.abstract_product_service import AbstractProductService
 from src.schemas.saga import SagaResponse
@@ -12,10 +13,12 @@ class ProductService(AbstractProductService):
     def __init__(
             self,
             product_repository: AbstractProductMongoRepository,
-            product_producer: ProductProducer
+            product_producer: ProductProducer,
+            elastic_product_service: ElasticProductService
     ):
         self.repository = product_repository
         self.product_producer = product_producer
+        self.elastic_product_service = elastic_product_service
 
     async def get_product(self, product_id: str) -> ProductRead | None:
         product = await self.repository.get_by_id(product_id)
@@ -34,7 +37,7 @@ class ProductService(AbstractProductService):
             skip: int = 0,
             limit: int = 100
     ) -> list[ProductRead]:
-        products = await self.repository.get_products(
+        product_ids = await self.elastic_product_service.get_products(
             name=name,
             brand=brand,
             brand_id=brand_id,
@@ -44,11 +47,16 @@ class ProductService(AbstractProductService):
             skip=skip,
             limit=limit
         )
+        products = await self.repository.get_by_ids(product_ids)
         return [ProductRead.from_orm(product) for product in products]
 
     async def create_product(self, product_data: ProductCreate) -> ProductRead:
         product = Product(**product_data.dict(), status=ProductStatus.DRAFT)
         created_product = await self.repository.create(product)
+        await self.elastic_product_service.create_product(
+            product_id=created_product.id,
+            product=product_data.dict()
+        )
         return ProductRead.from_orm(created_product)
 
     async def update_product(
@@ -62,6 +70,10 @@ class ProductService(AbstractProductService):
         update_data = {**existing.dict(), **product_update.dict()}
 
         updated_product = await self.repository.update(product_id, update_data)
+        await self.elastic_product_service.update_product(
+            product_id=product_id,
+            product=product_update.dict()
+        )
         if updated_product is None:
             return None
         return ProductRead.from_orm(updated_product)
@@ -81,6 +93,7 @@ class ProductService(AbstractProductService):
         await self.product_producer.stop()
 
         await self.repository.delete(product_id)
+        await self.elastic_product_service.delete_product(product_id)
 
         return SagaResponse(
             success=True,
