@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from beanie import Document, PydanticObjectId
 from pydantic import Field
 
-from src.enums.product import ProductStatus
+from src.core.enums.product import ProductStatus
 from src.schemas.products import ProductVariantSchema
 
 

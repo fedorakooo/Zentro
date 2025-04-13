@@ -1,8 +1,8 @@
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, field_serializer, validator
+from pydantic import BaseModel, validator
 from beanie import PydanticObjectId
 
-from src.enums.product import ProductStatus
+from src.core.enums.product import ProductStatus
 
 
 class ProductVariantSchema(BaseModel):

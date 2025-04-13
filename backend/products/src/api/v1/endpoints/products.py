@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from dependency_injector.wiring import inject, Provide
 
 from src.containers.container import Container
-from src.enums.product import ProductStatus
+from src.core.enums.product import ProductStatus
 from src.schemas.products import ProductRead, ProductCreate, ProductUpdate
 from src.application.abstractions.abstract_product_service import AbstractProductService
 from src.schemas.saga import SagaResponse
