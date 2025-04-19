@@ -52,7 +52,7 @@ async def create_pickup_point(
     return pickup_point_service.create_pickup_point(pickup_create)
 
 
-@router.delete("/{pickup-point-id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{pickup_point_id}", status_code=status.HTTP_204_NO_CONTENT)
 @inject
 async def delete_pickup_point_by_id(
         pickup_point_id: int,

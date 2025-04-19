@@ -27,7 +27,7 @@ async def get_pickup_point_operator(
     return operator
 
 
-@router.get("/{pickup_point_id}", response_model=list[PickupPointOperatorResponse])
+@router.get("/pickup-points/{pickup_point_id}", response_model=list[PickupPointOperatorResponse])
 @inject
 async def get_pickup_point_operators_by_pickup_point_id(
         pickup_point_id: int,
